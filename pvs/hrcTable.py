@@ -45,7 +45,7 @@ class HrcTable(DbHandler, MetaConfigInterface):
         from metaConfig.metaTable import MetaTable
         from metaConfig.metaTableField import MetaTableField
 
-        return MetaTable(
+        config = MetaTable(
             'hrc',
             header_doc="""In this csv file you are able to link different settings together which can be applied on an
 arbitrary source.""",
@@ -78,6 +78,10 @@ arbitrary source.""",
                 )
             ]
         )
+
+        # build sub-tree from hrc
+        config.add_children([EncodingTable.get_meta_description(), PacketLossTable.get_meta_description()])
+        return config
 
     def __init__(self, db_table_path, filters):
         """

@@ -66,6 +66,8 @@ applied on different streamed sources.""",
             ]
         )
 
+    # TODO add sub-tree!
+
     def __init__(self, db_table_path, filters):
         """
         Initialization of the class by it's super class

@@ -1,5 +1,6 @@
 __author__ = 'Alexander Dethof'
 
+from metaConfig.metaTableField import MetaTableField
 
 class MetaTable:
 
@@ -60,7 +61,7 @@ class MetaTable:
 
         return self
 
-    def __finalize(self):
+    def __finalize_file(self):
         self._cfd__file_handler.close()
         return self
 
@@ -70,7 +71,7 @@ class MetaTable:
 
         comment_lines = comment_text.split('\n')
         for comment_line in comment_lines:
-            self._cfd__file_handler.write(self.__comment_symbol + ' ' + comment_line)
+            self._cfd__file_handler.write(self.__comment_symbol + ' ' + comment_line + '\n')
 
         return self
 
@@ -89,19 +90,26 @@ class MetaTable:
         self.__add_comment_text('Fields:')
 
         for field_description in self.__fields:
-            assert isinstance(field_description, dict)
-            assert 'name' in field_description
-            assert 'type' in field_description
-            assert 'doc' in field_description
+            assert isinstance(field_description, MetaTableField)
 
-            self.__add_comment_text(
-                '* <%s> %s: %s' % (field_description['type'], field_description['name'], field_description['doc'])
-            )
+            comment_line = '* %s ' % field_description.get_type()
+
+            variants = field_description.get_variants()
+            if variants:
+                comment_line += '[' + '|'.join(variants) + '] '
+
+            comment_line += field_description.get_name()
+
+            doc = field_description.get_doc()
+            if doc:
+                comment_line += ': ' + doc
+
+            self.__add_comment_text(comment_line)
 
         return self.__add_empty_comment_line()
 
     def __add_column_separation_comment(self):
-        return self.__add_comment_text('NOTE: The table entries are separated by a %s' % self.__column_separator_name) \
+        return self.__add_comment_text('NOTE: The table entries are separated by a %s!' % self.__column_separator_name) \
                    .__add_empty_comment_line()
 
     def __add_column_headers(self):
@@ -109,16 +117,16 @@ class MetaTable:
 
         field_names = []
         for field_description in self.__fields:
-            assert isinstance(field_description, dict)
-            assert 'name' in field_description
-
-            field_names = field_description['name']
+            assert isinstance(field_description, MetaTableField)
+            field_names.append(field_description.get_name())
 
         self._cfd__file_handler.write(self.__column_separator.join(field_names))
+        return self
 
-    def __init_file(self, path):
+    def generate_file(self, path):
         assert isinstance(path, basestring)
 
+        # noinspection PyPep8Naming
         from os.path import extsep as FILE_EXTENSION_SEPARATOR, exists
         file_path = path + self.__file_name + FILE_EXTENSION_SEPARATOR + self.__extension
 
@@ -130,5 +138,5 @@ class MetaTable:
             .__add_field_description() \
             .__add_column_separation_comment() \
             .__add_column_headers() \
-            ._cfd__finalize()
+            .__finalize_file()
 

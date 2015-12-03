@@ -1,12 +1,12 @@
 __author__ = 'Alexander Dethof'
 
 from abc import ABCMeta
-from os.path import isdir
 
 from pvs import pvsMatrix
-from metaConfig import ChainConfig
+from chainApp.chainConfig import ChainConfig
 from cmd.operator import Operator
 from subtools.abstractSubTool import AbstractSubTool
+from os.path import isdir
 
 
 class AbstractTool(Operator):

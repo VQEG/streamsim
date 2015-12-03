@@ -132,8 +132,6 @@ class ChainSetup:
         hrc_node = HrcTable.get_meta_description()
         root_node.add_sibling(hrc_node)
 
-        # build sub-tree from hrc
-
         tree.generate_files()
 
 

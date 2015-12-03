@@ -18,4 +18,10 @@ class MetaTree:
         self.__root_node = node
 
     def generate_files(self):
-        pass
+        if self.__root_node is None:
+            return
+
+        assert isinstance(self.__root_node, MetaTable)
+        self.__root_node.generate_file(self.__root_path)
+
+        # TODO add file generation for siblings and children
