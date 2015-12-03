@@ -111,6 +111,32 @@ class ChainSetup:
         for folder_name in folder_names:
             self.__setup_dir(self.__config.get_path() + folder_name)
 
+    def __setup_config(self):
+        """
+
+        :return:
+        """
+
+        from metaConfig.metaTree import MetaTree
+        tree = MetaTree(self.__config.get_config_folder_path())
+
+        # build tree from root
+        from pvs.pvsMatrix import PvsMatrix
+        root_node = PvsMatrix.get_meta_description()
+        tree.set_root_node(root_node)
+
+        from pvs.srcTable import SrcTable
+        root_node.add_sibling(SrcTable.get_meta_description())
+
+        from pvs.hrcTable import HrcTable
+        hrc_node = HrcTable.get_meta_description()
+        root_node.add_sibling(hrc_node)
+
+        # build sub-tree from hrc
+
+        tree.generate_files()
+
+
     def setup(self):
         """
 
@@ -120,6 +146,9 @@ class ChainSetup:
         # setup system folders
         self.__setup_dir(self.__config.get_config_folder_path())
         self.__setup_dir(self.__config.get_log_folder_path())
+
+        # .. and the config files
+        self.__setup_config()
 
         # setup tool folders
         for tool_id in self.REQUIRED_FOLDERS:

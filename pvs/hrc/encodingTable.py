@@ -1,13 +1,14 @@
 __author__ = 'Alexander Dethof'
 
 from database.dbHandler import DbHandler
+from metaConfig.metaConfigInterface import MetaConfigInterface
 
 # List of database table field names
 #
 #
 
 
-class EncodingTable(DbHandler):
+class EncodingTable(DbHandler, MetaConfigInterface):
     """
     Represents the table which includes all settings for the encoding procedure
     """
@@ -39,6 +40,49 @@ class EncodingTable(DbHandler):
         DB_TABLE_FIELD_NAME_CODEC_ID,
         DB_TABLE_FIELD_NAME_CODEC_SETTINGS_ID
     )
+
+    @staticmethod
+    def get_meta_description():
+        from metaConfig.metaTable import MetaTable
+        from metaConfig.metaTableField import MetaTableField
+
+        return MetaTable(
+            'encoding',
+            header_doc="""In this csv file you are able to specify different sets of encoding settings which can be used
+ by different encoders, to encode an arbitrary video source.""",
+            fields=[
+                MetaTableField(
+                    EncodingTable.DB_TABLE_FIELD_NAME_ENCODING_ID,
+                    int,
+                    'unique id to identify the encoding data set'
+                ),
+                MetaTableField(
+                    EncodingTable.DB_TABLE_FIELD_NAME_CODEC_ID,
+                    str,
+                    'unique name id to identify the codec used for the encoding operation'
+                ),
+                MetaTableField(
+                    EncodingTable.DB_TABLE_FIELD_NAME_CODEC_SETTINGS_ID,
+                    int,
+                    'id to link these settings with the codec\'s appropriate settings'
+                ),
+                MetaTableField(
+                    EncodingTable.DB_TABLE_FIELD_NAME_BIT_RATE,
+                    int,
+                    'bit rate the video should be encoded with (unit: kbit/s)'
+                ),
+                MetaTableField(
+                    EncodingTable.DB_TABLE_FIELD_NAME_FPS,
+                    int,
+                    'number of frames to encode the video with (unit: frame/s)'
+                ),
+                MetaTableField(
+                    EncodingTable.DB_TABLE_FIELD_NAME_TWO_PASS,
+                    bool,
+                    '0 if one-pass encoding should be used, 1 otherwise'
+                )
+            ]
+        )
 
     def __init__(self, db_table_path, filters):
         """

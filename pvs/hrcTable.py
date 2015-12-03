@@ -1,13 +1,14 @@
 __author__ = 'Alexander Dethof'
 
 from database.dbHandler import DbHandler
+from metaConfig.metaConfigInterface import MetaConfigInterface
 from hrc.encodingTable import EncodingTable
 from hrc.packetLossTable import PacketLossTable
 # noinspection PyPep8Naming
 from os import sep as PATH_SEPARATOR
 
 
-class HrcTable(DbHandler):
+class HrcTable(DbHandler, MetaConfigInterface):
     """
     Represents the table containing all information about the HRC part of the PVS matrix, i.e. it delivers
     a link for each source to the appropriate encoding and loss insertion settings.
@@ -38,6 +39,45 @@ class HrcTable(DbHandler):
         DB_TABLE_FIELD_NAME_CODER_ID,
         DB_TABLE_FIELD_NAME_STREAM_MODE
     )
+
+    @staticmethod
+    def get_meta_description():
+        from metaConfig.metaTable import MetaTable
+        from metaConfig.metaTableField import MetaTableField
+
+        return MetaTable(
+            'hrc',
+            header_doc="""In this csv file you are able to link different settings together which can be applied on an
+arbitrary source.""",
+            fields=[
+                MetaTableField(
+                    HrcTable.DB_TABLE_FIELD_NAME_HRC_ID,
+                    int,
+                    'unique id for each individual HRC data set used to reference it'
+                ),
+                MetaTableField(
+                    EncodingTable.DB_TABLE_FIELD_NAME_ENCODING_ID,
+                    int,
+                    'id of the settings used for encoding (Defined in the hrc/encoding.csv file)'
+                ),
+                MetaTableField(
+                    PacketLossTable.DB_TABLE_FIELD_NAME_PACKET_LOSS_ID,
+                    int,
+                    'id of the settings used for packet manipulation (Defined in the hrc/packet_loss.csv file)'
+                ),
+                MetaTableField(
+                    HrcTable.DB_TABLE_FIELD_NAME_CODER_ID,
+                    str,
+                    'name of the coder to use for encoding, streaming and decoding'
+                ),
+                MetaTableField(
+                    HrcTable.DB_TABLE_FIELD_NAME_STREAM_MODE,
+                    str,
+                    'mode in which the file should be streamed',
+                    HrcTable.VALID_STREAM_MODES
+                )
+            ]
+        )
 
     def __init__(self, db_table_path, filters):
         """

@@ -1,9 +1,10 @@
 __author__ = 'Alexander Dethof'
 
 from database.dbHandler import DbHandler
+from metaConfig.metaConfigInterface import MetaConfigInterface
 
 
-class SrcTable(DbHandler):
+class SrcTable(DbHandler, MetaConfigInterface):
     """
     Represents the table which includes all settings for the source.
     """
@@ -17,6 +18,29 @@ class SrcTable(DbHandler):
         DB_TABLE_FIELD_NAME_SRC_ID,
         DB_TABLE_FIELD_NAME_SRC_NAME
     )
+
+    @staticmethod
+    def get_meta_description():
+        from metaConfig.metaTable import MetaTable
+        from metaConfig.metaTableField import MetaTableField
+
+        return MetaTable(
+            'src',
+            header_doc="""In this csv file you are able to specify which link resources should be used to perform
+operations on in the processing chain. Be aware that each file listed here must exists in the "srcVid" folder.""",
+            fields=[
+                MetaTableField(
+                    SrcTable.DB_TABLE_FIELD_NAME_SRC_ID,
+                    int,
+                    'unique id to identify each individual source'
+                ),
+                MetaTableField(
+                    SrcTable.DB_TABLE_FIELD_NAME_SRC_NAME,
+                    str,
+                    'unique name to identify the source file in the folder "srcVid"'
+                )
+            ]
+        )
 
     def __init__(self, db_table_path, filters):
         """

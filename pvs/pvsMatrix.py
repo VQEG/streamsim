@@ -4,9 +4,10 @@ from database import dbTable
 from srcTable import SrcTable
 from hrcTable import HrcTable
 from filters.filterSet import FilterSet
+from metaConfig.metaConfigInterface import MetaConfigInterface
 
 
-class PvsMatrix:
+class PvsMatrix(MetaConfigInterface):
     """
     This class represents the pvs matrix, which contains all information about the sources and settings to be used in
     the processing chain.
@@ -25,6 +26,34 @@ class PvsMatrix:
         SrcTable.DB_TABLE_FIELD_NAME_SRC_ID,
         HrcTable.DB_TABLE_FIELD_NAME_HRC_ID
     )
+
+    @staticmethod
+    def get_meta_description():
+        from metaConfig.metaTable import MetaTable
+        from metaConfig.metaTableField import MetaTableField
+
+        return MetaTable(
+            'pvs',
+            header_doc="""In this csv-file you are able to link sources with different HRC settings multiply.
+Remember to set for each individual connection a unique id.""",
+            fields=[
+                MetaTableField(
+                    PvsMatrix.DB_TABLE_FIELD_NAME_PVS_ID,
+                    int,
+                    'unique id for each connection'
+                ),
+                MetaTableField(
+                    SrcTable.DB_TABLE_FIELD_NAME_SRC_ID,
+                    int,
+                    'id of the source (specified in the source table) to link with the HRC'
+                ),
+                MetaTableField(
+                    HrcTable.DB_TABLE_FIELD_NAME_HRC_ID,
+                    int,
+                    'id of the HRC setting to link with the source'
+                )
+            ]
+        )
 
     def __init__(self, pvs_path, src_path, hrc_path, filters):
         """

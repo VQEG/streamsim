@@ -32,7 +32,7 @@ class EncodeTool(AbstractTool):
         :type pvs_matrix: pvs.pvsMatrix.PvsMatrix
 
         :param config: the config used for the tool's execution
-        :type config: chain_app.chainConfig.ChainConfig
+        :type config: chain_app.metaConfig.ChainConfig
         """
 
         super(self.__class__, self).__init__(pvs_matrix, config)
