@@ -2,9 +2,10 @@ __author__ = 'Alexander Dethof'
 
 
 from database.dbHandler import DbHandler
+from metaConfig.metaConfigInterface import MetaConfigInterface
 
 
-class PacketLossTable(DbHandler):
+class PacketLossTable(DbHandler, MetaConfigInterface):
     """
     Class to represent the data table which delivers all information about the loss settings.
     """
@@ -19,12 +20,51 @@ class PacketLossTable(DbHandler):
     DB_TABLE_FIELD_NAME_MANIPULATOR_TOOL = 'manipulator_tool'
     DB_TABLE_FIELD_NAME_MANIPULATOR_TOOL_ID = 'manipulator_tool_id'
 
+    DB_TABLE_FIELD_VALUE_MANIPULATOR_TOOL__NONE = 'none'
+    DB_TABLE_FIELD_VALUE_MANIPULATOR_TOOL__TC = 'tc'
+    DB_TABLE_FIELD_VALUE_MANIPULATOR_TOOL__TELCHEMY = 'telchemy'
+
+    VALID_FIELD_VALUES__MANIPULATOR_TOOL = (
+        DB_TABLE_FIELD_VALUE_MANIPULATOR_TOOL__NONE,
+        DB_TABLE_FIELD_VALUE_MANIPULATOR_TOOL__TC,
+        DB_TABLE_FIELD_VALUE_MANIPULATOR_TOOL__TELCHEMY
+    )
+
     # valid field names used in the table
     _valid_field_names = (
         DB_TABLE_FIELD_NAME_PACKET_LOSS_ID,
         DB_TABLE_FIELD_NAME_MANIPULATOR_TOOL,
         DB_TABLE_FIELD_NAME_MANIPULATOR_TOOL_ID
     )
+
+    @staticmethod
+    def get_meta_description():
+        from metaConfig.metaTable import MetaTable
+        from metaConfig.metaTableField import MetaTableField
+
+        return MetaTable(
+            PacketLossTable.DB_TABLE_NAME,
+            header_doc="""In this csv file you are able to set settings for packet loss manipulation, which can be
+applied on different streamed sources.""",
+            fields=[
+                MetaTableField(
+                    PacketLossTable.DB_TABLE_FIELD_NAME_PACKET_LOSS_ID,
+                    int,
+                    'unique id identifying the packet loss settings'
+                ),
+                MetaTableField(
+                    PacketLossTable.DB_TABLE_FIELD_NAME_MANIPULATOR_TOOL,
+                    str,
+                    'name of the manipulator tool to use',
+                    PacketLossTable.VALID_FIELD_VALUES__MANIPULATOR_TOOL
+                ),
+                MetaTableField(
+                    PacketLossTable.DB_TABLE_FIELD_NAME_MANIPULATOR_TOOL_ID,
+                    str,
+                    'unique id which refers to the manipulator\'s specific settings'
+                )
+            ]
+        )
 
     def __init__(self, db_table_path, filters):
         """

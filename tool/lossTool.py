@@ -24,11 +24,6 @@ class LossTool(AbstractTool):
     pcap files will be stored in a separate file.
     """
 
-    # define the available manipulators of the loss tool
-    LOSS_TOOL_TC = 'tc'
-    LOSS_TOOL_TELCHEMY = 'telchemy'
-    LOSS_TOOL_NONE = 'none'
-
     # define the available tool options
     OPTION_STORE_LOSS_TRACES = 'store_loss_traces'
     OPTION_TRACE_ONLY = 'trace_only'
@@ -107,17 +102,20 @@ class LossTool(AbstractTool):
         assert PacketLossTable.DB_TABLE_FIELD_NAME_MANIPULATOR_TOOL in packet_loss_settings
 
         manipulator_id = packet_loss_settings[PacketLossTable.DB_TABLE_FIELD_NAME_MANIPULATOR_TOOL]
-        if manipulator_id == self.LOSS_TOOL_NONE:
+        assert manipulator_id in PacketLossTable.VALID_FIELD_VALUES__MANIPULATOR_TOOL, \
+            "Invalid manipulator id `%s` given." % manipulator_id
+
+        if manipulator_id == PacketLossTable.DB_TABLE_FIELD_VALUE_MANIPULATOR_TOOL__NONE:
             return None
 
         assert PacketLossTable.DB_TABLE_FIELD_NAME_MANIPULATOR_TOOL_ID in packet_loss_settings
         manipulator_settings_id = int(packet_loss_settings[PacketLossTable.DB_TABLE_FIELD_NAME_MANIPULATOR_TOOL_ID])
 
-        if manipulator_id == self.LOSS_TOOL_TC:
+        if manipulator_id == PacketLossTable.DB_TABLE_FIELD_VALUE_MANIPULATOR_TOOL__TC:
             from manipulators.trafficControlManipulator import TrafficControlManipulator
             return TrafficControlManipulator(self, manipulator_settings_id, self._config.get_config_folder_path())
 
-        if manipulator_id == self.LOSS_TOOL_TELCHEMY:
+        if manipulator_id == PacketLossTable.DB_TABLE_FIELD_VALUE_MANIPULATOR_TOOL__TELCHEMY:
             from manipulators.telchemyManipulator import TelchemyManipulator
             return TelchemyManipulator(self, manipulator_settings_id, self._config.get_config_folder_path())
 

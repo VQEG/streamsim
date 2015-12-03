@@ -47,7 +47,7 @@ class EncodingTable(DbHandler, MetaConfigInterface):
         from metaConfig.metaTableField import MetaTableField
 
         return MetaTable(
-            'encoding',
+            EncodingTable.DB_TABLE_NAME,
             header_doc="""In this csv file you are able to specify different sets of encoding settings which can be used
  by different encoders, to encode an arbitrary video source.""",
             fields=[
