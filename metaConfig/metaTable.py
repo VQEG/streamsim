@@ -27,6 +27,7 @@ class MetaTable:
         self.__children = []
         self.__siblings = []
         self.__parent = None
+        self.__is_generated = False
 
     def set_parent(self, parent):
         self.__parent = parent
@@ -126,6 +127,11 @@ class MetaTable:
     def generate_file(self, path):
         assert isinstance(path, basestring)
 
+        if self.__is_generated:
+            return
+
+        print "Generate config file " + self.__file_name + " @ " + path
+
         # noinspection PyPep8Naming
         from os.path import extsep as FILE_EXTENSION_SEPARATOR, exists
         file_path = path + self.__file_name + FILE_EXTENSION_SEPARATOR + self.__extension
@@ -139,4 +145,26 @@ class MetaTable:
             .__add_column_separation_comment() \
             .__add_column_headers() \
             .__finalize_file()
+
+        self.__is_generated = True
+
+        if len(self.__siblings) > 0:
+            for sibling in self.__siblings:
+                assert isinstance(sibling, MetaTable)
+                sibling.generate_file(path)
+
+        if len(self.__children) > 0:
+            # noinspection PyPep8Naming
+            from os.path import sep as PATH_SEPARATOR, exists
+            child_path = path + self.__file_name + PATH_SEPARATOR
+
+            if not exists(child_path):
+                from os import mkdir
+                mkdir(child_path)
+
+            for child in self.__children:
+                assert isinstance(child, MetaTable)
+                child.generate_file(child_path)
+
+
 

@@ -23,5 +23,3 @@ class MetaTree:
 
         assert isinstance(self.__root_node, MetaTable)
         self.__root_node.generate_file(self.__root_path)
-
-        # TODO add file generation for siblings and children

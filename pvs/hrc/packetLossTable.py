@@ -60,7 +60,7 @@ applied on different streamed sources.""",
                 ),
                 MetaTableField(
                     PacketLossTable.DB_TABLE_FIELD_NAME_MANIPULATOR_TOOL_ID,
-                    str,
+                    int,
                     'unique id which refers to the manipulator\'s specific settings'
                 )
             ]
