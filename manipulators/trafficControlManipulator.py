@@ -18,7 +18,7 @@ class TrafficControlManipulator(AbstractManipulator):
     """
 
     # path of the manipulator resource table
-    MANIPULATOR_RESOURCE_PATH = 'hrc' + PATH_SEPARATOR + 'packet_loss' + PATH_SEPARATOR + 'tc'
+    MANIPULATOR_RESOURCE_PATH = 'hrc' + PATH_SEPARATOR + 'packet_loss' + PATH_SEPARATOR + TCRes.DB_TABLE_NAME
 
     def _get_resource_handler(self):
         """

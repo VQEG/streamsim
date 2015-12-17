@@ -1,6 +1,8 @@
 __author__ = 'Alexander Dethof'
 
 from metaConfig.metaTableField import MetaTableField
+import textwrap
+
 
 class MetaTable:
 
@@ -13,7 +15,8 @@ class MetaTable:
             header_doc='',
             comment_symbol='#',
             column_separator = ';',
-            column_separator_name = 'semicolon'
+            column_separator_name = 'semicolon',
+            footer_doc=''
     ):
         self.__file_name = file_name
         self.__extension = extension
@@ -23,6 +26,7 @@ class MetaTable:
         self.__header_doc = header_doc
         self.__fields = fields
         self.__data = data
+        self.__footer_doc = footer_doc
 
         self.__children = []
         self.__siblings = []
@@ -66,13 +70,18 @@ class MetaTable:
         self._cfd__file_handler.close()
         return self
 
+    def __add_comment_lines(self, comment_lines):
+        for comment_line in comment_lines:
+            self._cfd__file_handler.write(self.__comment_symbol + ' ' + comment_line + '\n')
+
+        return self
+
     def __add_comment_text(self, comment_text):
         assert isinstance(self._cfd__file_handler, file)
         assert isinstance(comment_text, basestring)
 
         comment_lines = comment_text.split('\n')
-        for comment_line in comment_lines:
-            self._cfd__file_handler.write(self.__comment_symbol + ' ' + comment_line + '\n')
+        self.__add_comment_lines(comment_lines)
 
         return self
 
@@ -80,38 +89,99 @@ class MetaTable:
         return self.__add_comment_text('')
 
     def __add_file_header(self):
-        return self.__add_comment_text(self.__file_name.upper()) \
+        table_name_upper = self.__file_name.upper()
+        doc = self.__header_doc.replace('\n', ' ')
+        doc = textwrap.wrap(doc, 120)
+
+        return self.__add_comment_text(table_name_upper) \
+                   .__add_comment_text('=' * len(table_name_upper)) \
                    .__add_empty_comment_line() \
-                   .__add_comment_text(self.__header_doc) \
+                   .__add_comment_lines(doc) \
                    .__add_empty_comment_line()
 
     def __add_field_description(self):
         assert isinstance(self.__fields, list)
 
         self.__add_comment_text('Fields:')
+        self.__add_comment_text('-------\n')
 
+        max_type_letter_count = 0
+        max_name_letter_count = 0
         for field_description in self.__fields:
             assert isinstance(field_description, MetaTableField)
 
-            comment_line = '* %s ' % field_description.get_type()
+            type_letter_count = len(str(field_description.get_type()))
+            name_letter_count = len(field_description.get_name())
+
+            if type_letter_count > max_type_letter_count:
+                max_type_letter_count = type_letter_count
+
+            if name_letter_count > max_name_letter_count:
+                max_name_letter_count = name_letter_count
+
+        for field_description in self.__fields:
+            field_name = field_description.get_name()
+            field_type = str(field_description.get_type())
+
+            type_space_count = max_type_letter_count - len(field_type)
+
+            field_comment = '* %s%s %s' % (field_type, ' ' * type_space_count, field_name)
+
+            line_space_count = max_name_letter_count + max_type_letter_count + 2  # + 3 for '* '
+
+            field_doc = field_description.get_doc()
+            if field_doc:
+                name_space_count = max_name_letter_count - len(field_name)
+                field_comment += ' ' * name_space_count + ' : '
+
+                field_doc.replace('\n', ' ')
+
+                field_doc_elements = textwrap.wrap(field_doc, 85)
+
+                field_comment += field_doc_elements[0]
+                del field_doc_elements[0]
+
+                # + 3 for ' : ' + 1 separator space between type and name
+                field_doc_line_spacer = '\n' + ' ' * (line_space_count + 4)
+                for field_doc_element in field_doc_elements:
+                    field_comment += field_doc_line_spacer + field_doc_element
 
             variants = field_description.get_variants()
-            if variants:
-                comment_line += '[' + '|'.join(variants) + '] '
+            if isinstance(variants, list) or isinstance(variants, tuple):
+                variant_values = variants
+            elif isinstance(variants, dict):
+                variant_values = variants.keys()
+            else:
+                raise Exception("Invalid variants given!")
 
-            comment_line += field_description.get_name()
+            if variant_values:
+                variant_spacer = '\n' + ' ' * (line_space_count + 5)  # + 3 for ' : ' and + 2 for tab space
+                max_variant_letter_count = 0
+                if isinstance(variants, dict):
+                    for variant_value in variant_values:
+                        variant_letter_count = len(variant_value)
+                        if variant_letter_count > max_variant_letter_count:
+                            max_variant_letter_count = variant_letter_count
 
-            doc = field_description.get_doc()
-            if doc:
-                comment_line += ': ' + doc
+                field_comment += '\n'
+                for variant_value in variant_values:
+                    variant_space_count = max_variant_letter_count - len(variant_value)
 
-            self.__add_comment_text(comment_line)
+                    field_comment += variant_spacer \
+                                  +  ' >> ' \
+                                  +  variant_value \
+                                  +  ' ' * variant_space_count
+
+                    if isinstance(variants, dict): # there exists a documentation!!
+                        field_comment += ' : ' + variants[variant_value]
+
+            field_comment += '\n'
+            self.__add_comment_text(field_comment)
 
         return self.__add_empty_comment_line()
 
     def __add_column_separation_comment(self):
-        return self.__add_comment_text('NOTE: The table entries are separated by a %s!' % self.__column_separator_name) \
-                   .__add_empty_comment_line()
+        return self.__add_comment_text('The table columns are separated by a %s!' % self.__column_separator_name)
 
     def __add_column_headers(self):
         assert isinstance(self.__fields, list)
@@ -122,6 +192,20 @@ class MetaTable:
             field_names.append(field_description.get_name())
 
         self._cfd__file_handler.write(self.__column_separator.join(field_names))
+        return self
+
+    def __add_annotations(self):
+
+        self.__add_comment_text('Annotation:') \
+            .__add_comment_text('-----------\n') \
+
+        if self.__footer_doc:
+            self.__add_comment_text(self.__footer_doc) \
+                .__add_empty_comment_line()
+
+        self.__add_column_separation_comment() \
+            .__add_empty_comment_line()
+
         return self
 
     def generate_file(self, path):
@@ -142,7 +226,7 @@ class MetaTable:
         self.__create_file(file_path) \
             .__add_file_header() \
             .__add_field_description() \
-            .__add_column_separation_comment() \
+            .__add_annotations() \
             .__add_column_headers() \
             .__finalize_file()
 

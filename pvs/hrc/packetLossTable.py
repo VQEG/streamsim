@@ -42,7 +42,7 @@ class PacketLossTable(DbHandler, MetaConfigInterface):
         from metaConfig.metaTable import MetaTable
         from metaConfig.metaTableField import MetaTableField
 
-        return MetaTable(
+        config = MetaTable(
             PacketLossTable.DB_TABLE_NAME,
             header_doc="""In this csv file you are able to set settings for packet loss manipulation, which can be
 applied on different streamed sources.""",
@@ -66,7 +66,11 @@ applied on different streamed sources.""",
             ]
         )
 
-    # TODO add sub-tree!
+        from manipulators.resources.trafficControlManipulatorResource import TrafficControlManipulatorResource as TCRes
+        config.add_child(TCRes.get_meta_description())
+        # TODO add further children
+
+        return config
 
     def __init__(self, db_table_path, filters):
         """
