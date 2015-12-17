@@ -67,8 +67,12 @@ applied on different streamed sources.""",
         )
 
         from manipulators.resources.trafficControlManipulatorResource import TrafficControlManipulatorResource as TCRes
-        config.add_child(TCRes.get_meta_description())
-        # TODO add further children
+        from manipulators.resources.telchemyManipulatorResource import TelchemyManipulatorResource as TelchemyRes
+
+        config.add_children([
+            TCRes.get_meta_description(),
+            TelchemyRes.get_meta_description()
+        ])
 
         return config
 

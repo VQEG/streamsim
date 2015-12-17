@@ -60,13 +60,13 @@ class TelchemyMarkovManipulator(AbstractTelchemyManipulator):
 
         assert isinstance(markov_type, basestring)
 
-        if markov_type == '2s':  # 2-state markov model
+        if markov_type == TelchemyMarkovRes.DB_FIELD_VALUE_MARKOV_TYPE_2STATE_VALUE:  # 2-state markov model
             self.__is_markov_2_state = True
 
-        elif markov_type == '4s': # 4-state markov model
+        elif markov_type == TelchemyMarkovRes.DB_FIELD_VALUE_MARKOV_TYPE_4STATE_VALUE: # 4-state markov model
             self.__is_markov_4_state = True
 
-        elif markov_type == 'p4':  # P.NAMS/P.NBAMS 4-state markov model
+        elif markov_type == TelchemyMarkovRes.DB_FIELD_VALUE_MARKOV_TYPE_PNAMSPBNAMS_4STATE_VALUE:  # P.NAMS/P.NBAMS 4-state markov model
             self.__is_markov_pnamspbnams_4_state = True
 
         else:
@@ -121,10 +121,10 @@ class TelchemyMarkovManipulator(AbstractTelchemyManipulator):
         assert isinstance(telchemy_command, Command)
         assert isinstance(self.__model_settings, dict)
 
-        telchemy_command.set_as_posix_option('pcb', float(self.__model_settings[Markov2StateRes.DB_FIELD_PCB]) / 100) \
-                        .set_as_posix_option('pbc', float(self.__model_settings[Markov2StateRes.DB_FIELD_PBC]) / 100) \
-                        .set_as_posix_option('g', float(self.__model_settings[Markov2StateRes.DB_FIELD_G]) / 100) \
-                        .set_as_posix_option('b', float(self.__model_settings[Markov2StateRes.DB_FIELD_B]) / 100)
+        telchemy_command.set_as_posix_option('pcb', float(self.__model_settings[Markov2StateRes.DB_FIELD_NAME_PCB]) / 100) \
+                        .set_as_posix_option('pbc', float(self.__model_settings[Markov2StateRes.DB_FIELD_NAME_PBC]) / 100) \
+                        .set_as_posix_option('g', float(self.__model_settings[Markov2StateRes.DB_FIELD_NAME_G]) / 100) \
+                        .set_as_posix_option('b', float(self.__model_settings[Markov2StateRes.DB_FIELD_NAME_B]) / 100)
 
     def __apply_markov_4_state_model(self, telchemy_command):
         """
@@ -137,20 +137,20 @@ class TelchemyMarkovManipulator(AbstractTelchemyManipulator):
         assert isinstance(telchemy_command, Command)
         assert isinstance(self.__model_settings, dict)
 
-        telchemy_command.set_as_posix_option('pba', float(self.__model_settings[Markov4StateRes.DB_FIELD_PBA]) / 100) \
-                        .set_as_posix_option('pbc', float(self.__model_settings[Markov4StateRes.DB_FIELD_PBA]) / 100)
+        telchemy_command.set_as_posix_option('pba', float(self.__model_settings[Markov4StateRes.DB_FIELD_NAME_PBA]) / 100) \
+                        .set_as_posix_option('pbc', float(self.__model_settings[Markov4StateRes.DB_FIELD_NAME_PBA]) / 100)
 
-        if Markov4StateRes.DB_FIELD_PDC in self.__model_settings:
-            telchemy_command.set_as_posix_option('pdc', float(self.__model_settings[Markov4StateRes.DB_FIELD_PDC]) / 100)
+        if Markov4StateRes.DB_FIELD_NAME_PDC in self.__model_settings:
+            telchemy_command.set_as_posix_option('pdc', float(self.__model_settings[Markov4StateRes.DB_FIELD_NAME_PDC]) / 100)
 
-        if Markov4StateRes.DB_FIELD_PCD in self.__model_settings:
-            telchemy_command.set_as_posix_option('pcd', float(self.__model_settings[Markov4StateRes.DB_FIELD_PCD]) / 100)
+        if Markov4StateRes.DB_FIELD_NAME_PCD in self.__model_settings:
+            telchemy_command.set_as_posix_option('pcd', float(self.__model_settings[Markov4StateRes.DB_FIELD_NAME_PCD]) / 100)
 
-        if Markov4StateRes.DB_FIELD_PCB in self.__model_settings:
-            telchemy_command.set_as_posix_option('pcb', float(self.__model_settings[Markov4StateRes.DB_FIELD_PCB]) / 100)
+        if Markov4StateRes.DB_FIELD_NAME_PCB in self.__model_settings:
+            telchemy_command.set_as_posix_option('pcb', float(self.__model_settings[Markov4StateRes.DB_FIELD_NAME_PCB]) / 100)
 
-        telchemy_command.set_as_posix_option('g', float(self.__model_settings[Markov4StateRes.DB_FIELD_G]) / 100) \
-                        .set_as_posix_option('b', float(self.__model_settings[Markov4StateRes.DB_FIELD_B]) / 100)
+        telchemy_command.set_as_posix_option('g', float(self.__model_settings[Markov4StateRes.DB_FIELD_NAME_G]) / 100) \
+                        .set_as_posix_option('b', float(self.__model_settings[Markov4StateRes.DB_FIELD_NAME_B]) / 100)
 
     def __apply_markov_pnamspbnams_4_state_model(self, telchemy_command):
         """
@@ -164,10 +164,10 @@ class TelchemyMarkovManipulator(AbstractTelchemyManipulator):
         assert isinstance(self.__model_settings, dict)
 
         telchemy_command.set_as_posix_option(
-            'loss_ratio', '%f' % (float(self.__model_settings[MarkovPNamsPNBams4StateRes.DB_FIELD_LOSS_RATIO]) / 100)
+            'loss_ratio', '%f' % (float(self.__model_settings[MarkovPNamsPNBams4StateRes.DB_FIELD_NAME_LOSS_RATIO]) / 100)
         ) \
                         .set_as_posix_option(
-            'gap_ratio', '%f' % (float(self.__model_settings[MarkovPNamsPNBams4StateRes.DB_FIELD_GAP_RATIO]) / 100)
+            'gap_ratio', '%f' % (float(self.__model_settings[MarkovPNamsPNBams4StateRes.DB_FIELD_NAME_GAP_RATIO]) / 100)
         )
 
     def __get_base_telchemy_command(self):
