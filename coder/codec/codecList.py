@@ -77,3 +77,18 @@ def get_codec(codec_id, codec_settings_id, config_folder_path):
     assert isinstance(codec, AbstractCodec)
 
     return codec
+
+
+def get_meta_descriptions():
+    """
+    Returns the meta descriptions of all available codecs
+    :return: meta descriptions of all available codecs
+    """
+
+    from x264Codec import X264Codec
+    from x265Codec import X265Codec
+
+    return (
+        X264Codec.get_meta_description(),
+        X265Codec.get_meta_description()
+    )

@@ -12,10 +12,76 @@ class X264Codec(AbstractCodec):
     This class can be used to encode videos with the x264 codec.
     """
 
+    DB_TABLE_NAME = 'x264'
+
+    DB_TABLE_FIELD_NAME_PRESET = 'preset'
     DB_TABLE_FIELD_NAME_BFRAMES = 'bframes'
     DB_TABLE_FIELD_NAME_CRF = 'crf'
     DB_TABLE_FIELD_NAME_KEYINT = 'keyint'
     DB_TABLE_FIELD_NAME_MIN_KEYINT = 'min-keyint'
+
+    DB_TABLE_FIELD_PRESET_VALUE_ULTRAFAST = 'ultrafast'
+    DB_TABLE_FIELD_PRESET_VALUE_SUPERFAST = 'superfast'
+    DB_TABLE_FIELD_PRESET_VALUE_VERYFAST = 'veryfast'
+    DB_TABLE_FIELD_PRESET_VALUE_FASTER = 'faster'
+    DB_TABLE_FIELD_PRESET_VALUE_FAST = 'fast'
+    DB_TABLE_FIELD_PRESET_VALUE_MEDIUM = 'medium'
+    DB_TABLE_FIELD_PRESET_VALUE_SLOW = 'slow'
+    DB_TABLE_FIELD_PRESET_VALUE_SLOWER = 'slower'
+    DB_TABLE_FIELD_PRESET_VALUE_VERYSLOW = 'veryslow'
+    DB_TABLE_FIELD_PRESET_VALUE_PLACEBO = 'placebo'
+
+    DB_TABLE_FIELD_PRESET_VALID_VALUES = (
+        DB_TABLE_FIELD_PRESET_VALUE_ULTRAFAST,
+        DB_TABLE_FIELD_PRESET_VALUE_SUPERFAST,
+        DB_TABLE_FIELD_PRESET_VALUE_VERYFAST,
+        DB_TABLE_FIELD_PRESET_VALUE_FASTER,
+        DB_TABLE_FIELD_PRESET_VALUE_FAST,
+        DB_TABLE_FIELD_PRESET_VALUE_MEDIUM,
+        DB_TABLE_FIELD_PRESET_VALUE_SLOW,
+        DB_TABLE_FIELD_PRESET_VALUE_SLOWER,
+        DB_TABLE_FIELD_PRESET_VALUE_VERYSLOW,
+        DB_TABLE_FIELD_PRESET_VALUE_PLACEBO
+    )
+
+    @staticmethod
+    def get_meta_description():
+        from metaConfig.metaTable import MetaTable
+        from metaConfig.metaTableField import MetaTableField
+
+        return MetaTable(
+            X264Codec.DB_TABLE_NAME,
+            header_doc="""In this csv file you are able to define multiple individual x264 settings which can be applied
+for video encoding techniques in the context of the processing chain.""",
+            fields=[
+                MetaTableField(
+                    CodecTable.DB_TABLE_FIELD_NAME_ID,
+                    int,
+                    'unique integer value identifying the data set'
+                ),
+                MetaTableField(
+                    X264Codec.DB_TABLE_FIELD_NAME_PRESET,
+                    str,
+                    'preset according to https://trac.ffmpeg.org/wiki/Encode/H.264#crf',
+                    X264Codec.DB_TABLE_FIELD_PRESET_VALID_VALUES
+                ),
+                MetaTableField(
+                    X264Codec.DB_TABLE_FIELD_NAME_CRF,
+                    int,
+                    'quantizer scale according to https://trac.ffmpeg.org/wiki/Encode/H.264#crf'
+                ),
+                MetaTableField(
+                    X264Codec.DB_TABLE_FIELD_NAME_KEYINT,
+                    int,
+                    'similiar to gop length; defines the maximum number of frames between two I-frames'
+                ),
+                MetaTableField(
+                    X264Codec.DB_TABLE_FIELD_NAME_MIN_KEYINT,
+                    int,
+                    'minimum distance between two I-frames'
+                )
+            ]
+        )
 
     @staticmethod
     def get_library_name():
@@ -82,6 +148,7 @@ class X264Codec(AbstractCodec):
             CodecTable.DB_TABLE_FIELD_NAME_ID,
 
             # configuration fields
+            self.DB_TABLE_FIELD_NAME_PRESET,
             self.DB_TABLE_FIELD_NAME_BFRAMES,
             self.DB_TABLE_FIELD_NAME_CRF,
             self.DB_TABLE_FIELD_NAME_KEYINT,

@@ -134,6 +134,18 @@ class ChainSetup:
 
         tree.generate_files()
 
+        from coder.codec import codecList
+        codec_meta_descriptions = codecList.get_meta_descriptions()
+
+        from os import mkdir
+        from os.path import sep as PATH_SEPARATOR
+        codec_config_file_path = self.__config.get_config_folder_path() + 'codec' + PATH_SEPARATOR # FIXME hard-code
+        mkdir(codec_config_file_path)
+
+        from metaConfig.metaTable import MetaTable
+        for codec_meta_description in codec_meta_descriptions:
+            assert isinstance(codec_meta_description, MetaTable)
+            codec_meta_description.generate_file(codec_config_file_path)
 
     def setup(self):
         """

@@ -2,9 +2,10 @@ __author__ = 'Alexander Dethof'
 
 from abc import ABCMeta, abstractmethod
 from pvs.hrc.codec.codecTable import CodecTable
+from metaConfig.metaConfigInterface import MetaConfigInterface
 
 
-class AbstractCodec(object):
+class AbstractCodec(MetaConfigInterface):
     """
     Abstract class which should be used for codec classes to extend from. It delivers a method which automatically loads
     the settings from the appropriate codec configuration table and a method to migrate different settings.
@@ -34,6 +35,11 @@ class AbstractCodec(object):
         self._encoding_settings = {}
 
         self._migrate_settings()
+
+    @staticmethod
+    @abstractmethod
+    def get_meta_description():
+        pass
 
     @staticmethod
     @abstractmethod

@@ -12,6 +12,9 @@ class X265Codec(AbstractCodec):
     This class can be used to encode videos with the x265 codec.
     """
 
+    DB_TABLE_NAME = 'x265'
+
+    DB_TABLE_FIELD_NAME_PRESET = 'preset'
     DB_TABLE_FIELD_NAME_BFRAMES = 'bframes'
     DB_TABLE_FIELD_NAME_CRF = 'crf'
     DB_TABLE_FIELD_NAME_KEYINT = 'keyint'
@@ -20,6 +23,94 @@ class X265Codec(AbstractCodec):
     DB_TABLE_FIELD_NAME_ME = 'me'
     DB_TABLE_FIELD_NAME_SLICES = 'slices'
     DB_TABLE_FIELD_NAME_BPYRAMID = 'bpyramid'
+
+    DB_TABLE_FIELD_PRESET_VALUE_ULTRAFAST = 'ultrafast'
+    DB_TABLE_FIELD_PRESET_VALUE_SUPERFAST = 'superfast'
+    DB_TABLE_FIELD_PRESET_VALUE_VERYFAST = 'veryfast'
+    DB_TABLE_FIELD_PRESET_VALUE_FASTER = 'faster'
+    DB_TABLE_FIELD_PRESET_VALUE_FAST = 'fast'
+    DB_TABLE_FIELD_PRESET_VALUE_MEDIUM = 'medium'
+    DB_TABLE_FIELD_PRESET_VALUE_SLOW = 'slow'
+    DB_TABLE_FIELD_PRESET_VALUE_SLOWER = 'slower'
+    DB_TABLE_FIELD_PRESET_VALUE_VERYSLOW = 'veryslow'
+    DB_TABLE_FIELD_PRESET_VALUE_PLACEBO = 'placebo'
+
+    DB_TABLE_FIELD_PRESET_VALID_VALUES = (
+        DB_TABLE_FIELD_PRESET_VALUE_ULTRAFAST,
+        DB_TABLE_FIELD_PRESET_VALUE_SUPERFAST,
+        DB_TABLE_FIELD_PRESET_VALUE_VERYFAST,
+        DB_TABLE_FIELD_PRESET_VALUE_FASTER,
+        DB_TABLE_FIELD_PRESET_VALUE_FAST,
+        DB_TABLE_FIELD_PRESET_VALUE_MEDIUM,
+        DB_TABLE_FIELD_PRESET_VALUE_SLOW,
+        DB_TABLE_FIELD_PRESET_VALUE_SLOWER,
+        DB_TABLE_FIELD_PRESET_VALUE_VERYSLOW,
+        DB_TABLE_FIELD_PRESET_VALUE_PLACEBO
+    )
+
+    @staticmethod
+    def get_meta_description():
+        from metaConfig.metaTable import MetaTable
+        from metaConfig.metaTableField import MetaTableField
+
+        return MetaTable(
+            X265Codec.DB_TABLE_NAME,
+            header_doc="""In this csv file you are able to define multiple individual x265 settings which can be applied
+for video encoding techniques in the context of the processing chain.""",
+            fields=[
+                MetaTableField(
+                    CodecTable.DB_TABLE_FIELD_NAME_ID,
+                    int,
+                    'unique integer value identifying the data set'
+                ),
+                MetaTableField(
+                    X265Codec.DB_TABLE_FIELD_NAME_PRESET,
+                    str,
+                    'preset according to https://trac.ffmpeg.org/wiki/Encode/H.264#crf',
+                    X265Codec.DB_TABLE_FIELD_PRESET_VALID_VALUES
+                ),
+                MetaTableField(
+                    X265Codec.DB_TABLE_FIELD_NAME_CRF,
+                    int,
+                    'quantizer scale according to https://trac.ffmpeg.org/wiki/Encode/H.264#crf'
+                ),
+                MetaTableField(
+                    X265Codec.DB_TABLE_FIELD_NAME_KEYINT,
+                    int,
+                    'similiar to gop length; defines the maximum number of frames between two I-frames'
+                ),
+                MetaTableField(
+                    X265Codec.DB_TABLE_FIELD_NAME_MIN_KEYINT,
+                    int,
+                    'minimum distance between two I-frames'
+                ),
+                MetaTableField(
+                    X265Codec.DB_TABLE_FIELD_NAME_MERANGE,
+                    int,
+                    'motion search range [default: 57]'
+                ),
+                MetaTableField(
+                    X265Codec.DB_TABLE_FIELD_NAME_ME,
+                    str,
+                    'motion search method',
+                    ('dia', 'hex [default]', 'umh', 'star', 'full')
+                ),
+                MetaTableField(
+                    X265Codec.DB_TABLE_FIELD_NAME_SLICES,
+                    int
+                ),
+                MetaTableField(
+                    X265Codec.DB_TABLE_FIELD_NAME_BPYRAMID,
+                    str,
+                    'use, if possible, b-frames as references'
+                ),
+                MetaTableField(
+                    X265Codec.DB_TABLE_FIELD_NAME_BFRAMES,
+                    int,
+                    'max number of consecutive b-frames'
+                )
+            ]
+        )
 
     @staticmethod
     def get_library_name():
