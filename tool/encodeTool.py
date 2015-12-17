@@ -78,7 +78,7 @@ class EncodeTool(AbstractTool):
                            + self._get_output_file_name(
                                 src_id,
                                 hrc_set,
-                                'mov'  # codec.get_raw_file_extension() # TODO
+                                codec.get_raw_file_extension()
                             )
 
         if self._IS_INFO_MODE:

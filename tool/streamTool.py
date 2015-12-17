@@ -152,7 +152,7 @@ class StreamTool(AbstractTool):
 
         codec = self._get_codec_by_hrc_set(hrc_set)
         file_path = self._path + STREAM_SOURCE_DIR + PATH_SEPARATOR + self._get_output_file_name(
-            src_id, hrc_set, 'mov'  # codec.get_raw_file_extension() # TODOwebtv999
+            src_id, hrc_set, codec.get_raw_file_extension()
         )
 
         if not isfile(file_path):
