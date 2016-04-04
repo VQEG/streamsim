@@ -39,7 +39,7 @@ class EncodeTool(AbstractTool):
         self.__encoding_table = pvs_matrix.get_hrc_table().get_encoding_table()
         self.__src_enc_references = dict()
 
-    def __encode_source_by_hrc(self, src_id, src_name, hrc_set):
+    def __encode_source_by_hrc(self, src_id, src_name, src_set, hrc_set):
         """
         Encodes a given video source according to a specific HRC definition.
 
@@ -49,12 +49,16 @@ class EncodeTool(AbstractTool):
         :param src_name: the name of the source to encode
         :type src_name: basestring
 
+        :param src_set: the settings of the source to encode
+        :type src_set: dict
+
         :param hrc_set: the set defining the HRC
         :type hrc_set: dict
         """
 
         # check if args are valid
         assert isinstance(src_id, int)
+        assert isinstance(src_set, dict)
         assert isinstance(hrc_set, dict)
 
         # request hrc id
@@ -133,12 +137,12 @@ class EncodeTool(AbstractTool):
 
         # execute coder
         coder.set_dry_mode(self._is_dry_run) \
-             .encode(encoding_set)
+             .encode(encoding_set, src_set)
 
         # register encoding id with hrc id in references
         self.__src_enc_references[src_id][encoding_id] = hrc_id
 
-    def __encode_source_by_hrcs(self, src_id, src_name, hrc_sets):
+    def __encode_source_by_hrcs(self, src_id, src_name, src_set, hrc_sets):
         """
         Encodes a given video source according to the given HRC definitions.
 
@@ -148,12 +152,16 @@ class EncodeTool(AbstractTool):
         :param src_name: the name of the source to encode
         :type src_name: basestring
 
+        :param src_set: the settings of the source to encode
+        :type src_set: dict
+
         :param hrc_sets: the HRC configurations to encode the video with
         :type hrc_sets: dict[]
         """
 
         assert isinstance(src_id, int)
         assert isinstance(src_name, basestring)
+        assert isinstance(src_set, dict)
         assert isinstance(hrc_sets, list)
 
         # if not done yet, create an entry in the source's encoding reference list
@@ -167,9 +175,9 @@ class EncodeTool(AbstractTool):
 
         # loop through the sets and encode the video with each HRC definition
         for hrc_set in hrc_sets:
-            self.__encode_source_by_hrc(src_id, src_name, hrc_set)
+            self.__encode_source_by_hrc(src_id, src_name, src_set, hrc_set)
 
-    def __encode_source(self, src_id, src_name):
+    def __encode_source(self, src_id, src_name, src_set):
         """
         This method will find the appropriate HRC definitions for a given source and executes an encoding process for
         each HRC definition on the source.
@@ -179,16 +187,20 @@ class EncodeTool(AbstractTool):
 
         :param src_name: the name of the source
         :type src_name: basestring
+
+        :param src_set: the settings of the source to encode
+        :type src_set: dict
         """
 
         assert isinstance(src_id, int)
         assert isinstance(src_name, basestring)
+        assert isinstance(src_set, dict)
 
         # load encoding configuration of the given source
         hrc_sets = self._pvs_matrix.get_hrc_sets_of_src_id(src_id)
 
         # encode video with the settings
-        self.__encode_source_by_hrcs(src_id, src_name, hrc_sets)
+        self.__encode_source_by_hrcs(src_id, src_name, src_set, hrc_sets)
 
     def execute(self):
         """
@@ -198,22 +210,22 @@ class EncodeTool(AbstractTool):
 
         super(self.__class__, self).execute()
 
-        for source in self._src_sets:
+        for src_set in self._src_sets:
 
-            assert isinstance(source, dict)
-            assert self._src_table.DB_TABLE_FIELD_NAME_SRC_ID in source
-            assert self._src_table.DB_TABLE_FIELD_NAME_SRC_NAME in source
+            assert isinstance(src_set, dict)
+            assert self._src_table.DB_TABLE_FIELD_NAME_SRC_ID in src_set
+            assert self._src_table.DB_TABLE_FIELD_NAME_SRC_NAME in src_set
 
             # get source fields
-            src_id = int(source[self._src_table.DB_TABLE_FIELD_NAME_SRC_ID])
-            src_name = source[self._src_table.DB_TABLE_FIELD_NAME_SRC_NAME]
+            src_id = int(src_set[self._src_table.DB_TABLE_FIELD_NAME_SRC_ID])
+            src_name = src_set[self._src_table.DB_TABLE_FIELD_NAME_SRC_NAME]
 
             if self._IS_INFO_MODE:
                 print '--> ENCODE source -- id: %d | name: %s' % (src_id, src_name)
 
             try:
                 # encode video
-                self.__encode_source(src_id, src_name)
+                self.__encode_source(src_id, src_name, src_set)
             except (KeyError, Warning) as e:
                 # Key errors and Warnings are usually internal errors which can be ignored during the encoding process.
                 # They will only lead to the circumstance that not all videos could be converted with the given

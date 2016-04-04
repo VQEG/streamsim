@@ -123,11 +123,16 @@ class AbstractCoder(Operator):
         return self
 
     @abstractmethod
-    def encode(self, encoding_set):
+    def encode(self, encoding_set, src_set):
         """
         Abstract method which has to be implemented in all classes extending this one. Used to perform an interaction
         to encode a video.
+
         :param encoding_set: the data set containing all information for encoding processes
+        :type encoding_set: dict
+
+        :param src_set: the settings of the source to encode
+        :type src_set: dict
         """
 
         pass

@@ -114,13 +114,16 @@ class FfmpegCoder(AbstractCoder):
         if stream_mode in udp_formats:
             return 'udp'
 
-    def __get_general_encoding_command_without_destination(self, encoding_set, is_debug_mode):
+    def __get_general_encoding_command_without_destination(self, encoding_set, src_set, is_debug_mode):
         """
         Returns the general encoding command without a destination path. After adding a destination path it
         can be directly executed or further modified (useful for twopass coding)
 
         :param encoding_set: the configuration set describing the encoding configuration
         :type encoding_set: dict
+
+        :param src_set: the settings of the source to encode
+        :type src_set: dict
 
         :param is_debug_mode: True is debug logging is allowed, False otherwise
         :type is_debug_mode: bool
@@ -132,6 +135,7 @@ class FfmpegCoder(AbstractCoder):
         assert self._src_path != self.DEFAULT_SRC_PATH
         assert self._destination_path != self.DEFAULT_DESTINATION_PATH
         assert isinstance(encoding_set, dict)
+        assert isinstance(src_set, dict)
 
         codec = self.__get_codec(encoding_set)
         codec.set_general_encoding_settings(encoding_set)
@@ -157,14 +161,14 @@ class FfmpegCoder(AbstractCoder):
         """
         -s <FRAME_SIZE>: defines the frames' size
         """
-        assert SrcTable.DB_TABLE_FIELD_NAME_RES in encoding_set
-        command.set_as_posix_option('s', encoding_set[SrcTable.DB_TABLE_FIELD_NAME_RES])
+        assert SrcTable.DB_TABLE_FIELD_NAME_RES in src_set
+        command.set_as_posix_option('s', src_set[SrcTable.DB_TABLE_FIELD_NAME_RES])
 
         """
         -r <FPS>: sets the frame rate (frames/second)
         """
-        assert SrcTable.DB_TABLE_FIELD_NAME_FPS in encoding_set
-        fps = encoding_set[SrcTable.DB_TABLE_FIELD_NAME_FPS]
+        assert SrcTable.DB_TABLE_FIELD_NAME_FPS in src_set
+        fps = src_set[SrcTable.DB_TABLE_FIELD_NAME_FPS]
         if fps:
             command.set_as_posix_option('r', float(fps))
 
@@ -196,18 +200,25 @@ class FfmpegCoder(AbstractCoder):
 
         return command
 
-    def __one_pass_encoding(self, encoding_set, is_debug_mode):
+    def __one_pass_encoding(self, encoding_set, src_set, is_debug_mode):
         """
         Executes a single encoding command according to the coder's source/destination-path configuration.
 
         :param encoding_set: the configuration set describing the encoder's settings
         :type encoding_set: dict
 
+        :param src_set: the settings of the source to encode
+        :type src_set: dict
+
         :param is_debug_mode: True is debug logging is allowed, False otherwise
         :type is_debug_mode: bool
         """
 
-        encoding_command = self.__get_general_encoding_command_without_destination(encoding_set, is_debug_mode)
+        encoding_command = self.__get_general_encoding_command_without_destination(
+            encoding_set,
+            src_set,
+            is_debug_mode
+        )
 
         """
         add output file information
@@ -217,7 +228,7 @@ class FfmpegCoder(AbstractCoder):
         # execute command
         self._cmd(encoding_command)
 
-    def __two_pass_encoding(self, encoding_set, is_debug_mode):
+    def __two_pass_encoding(self, encoding_set, src_set, is_debug_mode):
         """
         Executes a two encoding commands according to the coder's source/destination-path configuration for two-pass
         coding. The first encoding command will write the output to devnull.
@@ -225,11 +236,18 @@ class FfmpegCoder(AbstractCoder):
         :param encoding_set: the configuration set describing the encoder's settings
         :type encoding_set: dict
 
+        :param src_set: the settings of the source to encode
+        :type src_set: dict
+
         :param is_debug_mode: True is debug logging is allowed, False otherwise
         :type is_debug_mode: bool
         """
 
-        first_pass_command = self.__get_general_encoding_command_without_destination(encoding_set, is_debug_mode)
+        first_pass_command = self.__get_general_encoding_command_without_destination(
+            encoding_set,
+            src_set,
+            is_debug_mode
+        )
 
         from copy import deepcopy
         two_pass_command = deepcopy(first_pass_command)
@@ -246,7 +264,7 @@ class FfmpegCoder(AbstractCoder):
 
         self._cmd(encoding_command_collection)
 
-    def encode(self, encoding_set, is_debug_mode=_GLOBAL_DEBUG_MODE):
+    def encode(self, encoding_set, src_set, is_debug_mode=_GLOBAL_DEBUG_MODE):
         """
         Encodes the coder's source (raw video) to the coder's destination (hevc) according to the configuration given
         as argument.
@@ -254,17 +272,21 @@ class FfmpegCoder(AbstractCoder):
         :param encoding_set: the data set containing all encoding information
         :type encoding_set: basestring
 
+        :param src_set: the settings of the source to encode
+        :type src_set: dict
+
         :param is_debug_mode: True is debug logging is allowed, False otherwise
         :type is_debug_mode: bool
         """
 
         assert isinstance(encoding_set, dict)
+        assert isinstance(src_set, dict)
         assert EncodingTable.DB_TABLE_FIELD_NAME_TWO_PASS in encoding_set
 
         if bool(int(encoding_set[EncodingTable.DB_TABLE_FIELD_NAME_TWO_PASS])):
-            self.__two_pass_encoding(encoding_set, is_debug_mode)
+            self.__two_pass_encoding(encoding_set, src_set, is_debug_mode)
         else:
-            self.__one_pass_encoding(encoding_set, is_debug_mode)
+            self.__one_pass_encoding(encoding_set, src_set, is_debug_mode)
 
     def decode_video(self, is_debug_mode=_GLOBAL_DEBUG_MODE):
         """
