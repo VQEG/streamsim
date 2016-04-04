@@ -114,10 +114,71 @@ class FfmpegCoder(AbstractCoder):
         if stream_mode in udp_formats:
             return 'udp'
 
-    def __get_general_encoding_command_without_destination(self, encoding_set, src_set, is_debug_mode):
+    def __extend_command_with_alternative_command_line(self, command, alt_command_line, src_set, is_debug_mode):
+        """
+        Adds a command line text to a given encoding command
+
+        :param command: the general encoding command without a destination path.
+        :type command: Command
+
+        :param alt_command_line: the command line to add to the command
+        :type alt_command_line: basestring
+
+        :param src_set: the settings of the source to encode
+        :type src_set: dict
+
+        :param is_debug_mode: True is debug logging is allowed, False otherwise
+        :type is_debug_mode: bool
+        """
+
+        assert isinstance(command, Command)
+        assert isinstance(alt_command_line, basestring)
+        assert isinstance(src_set, dict)
+        assert isinstance(is_debug_mode, bool)
+
+        #
+        # replace occurrences of alternative command line fields
+        #
+
+        # src path
+        alt_command_line = alt_command_line.replace(
+            EncodingTable.ALT_CMD_FIELD_SRC_PATH,
+            self._src_path
+        )
+
+        # fps value
+        assert SrcTable.DB_TABLE_FIELD_NAME_FPS in src_set
+        alt_command_line = alt_command_line.replace(
+            EncodingTable.ALT_CMD_FIELD_FPS_VALUE,
+            src_set[SrcTable.DB_TABLE_FIELD_NAME_FPS]
+        )
+
+        # destination path (usually not required)
+        alt_command_line = alt_command_line.replace(
+            EncodingTable.ALT_CMD_FIELD_OUT_PATH,
+            self._destination_path
+        )
+
+        # res value
+        assert SrcTable.DB_TABLE_FIELD_NAME_RES in src_set
+        alt_command_line = alt_command_line.replace(
+            EncodingTable.ALT_CMD_FIELD_RES_VALUE,
+            src_set[SrcTable.DB_TABLE_FIELD_NAME_RES]
+        )
+
+        #
+        # add evaluated command line to given command instance
+        #
+
+        command.set_as_argument('ALTERNATIVE_CMD_LINE', alt_command_line)
+
+    def __extend_command_with_encoding_table_settings(self, command, encoding_set, src_set, is_debug_mode):
         """
         Returns the general encoding command without a destination path. After adding a destination path it
         can be directly executed or further modified (useful for twopass coding)
+
+        :param command: the general encoding command without a destination path.
+        :type command: Command
 
         :param encoding_set: the configuration set describing the encoding configuration
         :type encoding_set: dict
@@ -127,21 +188,13 @@ class FfmpegCoder(AbstractCoder):
 
         :param is_debug_mode: True is debug logging is allowed, False otherwise
         :type is_debug_mode: bool
-
-        :return: the general encoding command without a destination path.
-        :rtype: Command
         """
 
-        assert self._src_path != self.DEFAULT_SRC_PATH
-        assert self._destination_path != self.DEFAULT_DESTINATION_PATH
         assert isinstance(encoding_set, dict)
         assert isinstance(src_set, dict)
 
         codec = self.__get_codec(encoding_set)
         codec.set_general_encoding_settings(encoding_set)
-
-        # build encoder command
-        command = Command(APP_PATH)
 
         """
         -y: overwrite output file in each case without asking
@@ -197,6 +250,38 @@ class FfmpegCoder(AbstractCoder):
         """
         if is_debug_mode:
             command.set_as_posix_option('loglevel', 'debug')
+
+    def __get_general_encoding_command_without_destination(self, encoding_set, src_set, is_debug_mode):
+        """
+        Returns the general encoding command without a destination path. After adding a destination path it
+        can be directly executed or further modified (useful for twopass coding)
+
+        :param encoding_set: the configuration set describing the encoding configuration
+        :type encoding_set: dict
+
+        :param src_set: the settings of the source to encode
+        :type src_set: dict
+
+        :param is_debug_mode: True is debug logging is allowed, False otherwise
+        :type is_debug_mode: bool
+
+        :return: the general encoding command without a destination path.
+        :rtype: Command
+        """
+
+        assert self._src_path != self.DEFAULT_SRC_PATH
+        assert self._destination_path != self.DEFAULT_DESTINATION_PATH
+        assert isinstance(encoding_set, dict)
+        assert isinstance(src_set, dict)
+
+        # build encoder command
+        command = Command(APP_PATH)
+
+        alt_cmd_line = encoding_set[EncodingTable.DB_TABLE_FIELD_NAME_ALTERNATIVE_COMMAND_LINE]
+        if alt_cmd_line:
+            self.__extend_command_with_alternative_command_line(command, alt_cmd_line, src_set, is_debug_mode)
+        else:
+            self.__extend_command_with_encoding_table_settings(command, encoding_set, src_set, is_debug_mode)
 
         return command
 
