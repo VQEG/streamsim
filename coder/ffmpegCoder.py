@@ -150,7 +150,7 @@ class FfmpegCoder(AbstractCoder):
         assert SrcTable.DB_TABLE_FIELD_NAME_FPS in src_set
         alt_command_line = alt_command_line.replace(
             EncodingTable.ALT_CMD_FIELD_FPS_VALUE,
-            src_set[SrcTable.DB_TABLE_FIELD_NAME_FPS]
+            str(src_set[SrcTable.DB_TABLE_FIELD_NAME_FPS])
         )
 
         # destination path (usually not required)
@@ -277,11 +277,20 @@ class FfmpegCoder(AbstractCoder):
         # build encoder command
         command = Command(APP_PATH)
 
-        alt_cmd_line = encoding_set[EncodingTable.DB_TABLE_FIELD_NAME_ALTERNATIVE_COMMAND_LINE]
-        if alt_cmd_line:
-            self.__extend_command_with_alternative_command_line(command, alt_cmd_line, src_set, is_debug_mode)
+        if EncodingTable.DB_TABLE_FIELD_NAME_ALTERNATIVE_COMMAND_LINE in encoding_set:
+            self.__extend_command_with_alternative_command_line(
+                command,
+                encoding_set[EncodingTable.DB_TABLE_FIELD_NAME_ALTERNATIVE_COMMAND_LINE],
+                src_set,
+                is_debug_mode
+            )
         else:
-            self.__extend_command_with_encoding_table_settings(command, encoding_set, src_set, is_debug_mode)
+            self.__extend_command_with_encoding_table_settings(
+                command,
+                encoding_set,
+                src_set,
+                is_debug_mode
+            )
 
         return command
 
