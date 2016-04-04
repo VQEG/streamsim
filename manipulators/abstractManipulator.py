@@ -150,7 +150,7 @@ class AbstractManipulator(Operator):
         :rtype: AbstractManipulator
         """
 
-        assert isinstance(log_folder, basestring)
+        assert isinstance(log_folder, basestring) or log_folder is None
         assert isinstance(log_suffix, basestring)
 
         if log_folder:

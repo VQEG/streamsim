@@ -477,9 +477,6 @@ then by the telchemy tool to manipulate different pcap files with loss behaviour
         self._assert_fields(row, self.DB_FIELD_NAME_ID, (
             self.DB_FIELD_NAME_PBA,
             self.DB_FIELD_NAME_PBC,
-            self.DB_FIELD_NAME_PDC,
-            self.DB_FIELD_NAME_PCD,
-            self.DB_FIELD_NAME_PCB,
             self.DB_FIELD_NAME_G,
             self.DB_FIELD_NAME_B
         ))

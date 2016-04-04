@@ -18,11 +18,8 @@ class AbstractCoder(Operator):
     # path configuration
     #
 
-    # the path to the program of the coder which performs the encoding
+    # the path to the program of the coder which performs the en-/decoding
     APP_PATH = ''  # TODO force properties to be set
-
-    # the path to the program of the coder which performs the decoding
-    APP_PATH = ''
 
     # the path to the program of the coder which performs the send operations for streaming
     STREAMER_PATH = ''  # TODO force properties to be set
