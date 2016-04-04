@@ -173,7 +173,14 @@ class MetaTable:
                                   +  ' ' * variant_space_count
 
                     if isinstance(variants, dict): # there exists a documentation!!
-                        field_comment += ' : ' + variants[variant_value]
+                        variant_doc_elements = textwrap.wrap(variants[variant_value], 50)
+                        field_comment += ' : ' + variant_doc_elements[0]
+                        del variant_doc_elements[0]
+
+                        # + 3 for ' : ' + 4 for ' >> '
+                        variant_doc_element_spacer = variant_spacer + ' ' * (7 + max_variant_letter_count)
+                        for variant_doc_element in variant_doc_elements:
+                            field_comment += variant_doc_element_spacer + variant_doc_element
 
             field_comment += '\n'
             self.__add_comment_text(field_comment)

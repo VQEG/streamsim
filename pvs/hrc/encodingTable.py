@@ -94,7 +94,7 @@ You can use the following parameters as generic variables within your command li
 source file name""",
                         EncodingTable.ALT_CMD_FIELD_OUT_PATH: """The complete path of the destination where to save the
 encoded video (usually not required, is added
-automatically)""",
+automatically at the line's end)""",
                         EncodingTable.ALT_CMD_FIELD_FPS_VALUE: """The fps value of the appropriate source defined in the
 source table""",
                         EncodingTable.ALT_CMD_FIELD_RES_VALUE: """The res value of the appropriate source defined in the
