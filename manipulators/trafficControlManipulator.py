@@ -100,7 +100,7 @@ class TrafficControlManipulator(AbstractManipulator):
             import TrafficControlManipulatorRandomModeResource \
             as TCLossRes
 
-        tc_loss_res = TCLossRes(self.MANIPULATOR_RESOURCE_PATH + PATH_SEPARATOR + 'random')
+        tc_loss_res = TCLossRes(self._config_path + self.MANIPULATOR_RESOURCE_PATH + PATH_SEPARATOR + 'random')
         loss_mode_settings = tc_loss_res.get_row_with_id(loss_mode_id)
 
         tc_command.set_as_argument('LOSS_MODE', 'random') \

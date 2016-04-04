@@ -12,11 +12,15 @@ class SrcTable(DbHandler, MetaConfigInterface):
     # general src fields
     DB_TABLE_FIELD_NAME_SRC_ID = 'src_id'
     DB_TABLE_FIELD_NAME_SRC_NAME = 'src_name'
+    DB_TABLE_FIELD_NAME_FPS = 'fps'
+    DB_TABLE_FIELD_NAME_RES = 'res'
 
     # valid field names used in the src table
     _valid_field_names = (
         DB_TABLE_FIELD_NAME_SRC_ID,
-        DB_TABLE_FIELD_NAME_SRC_NAME
+        DB_TABLE_FIELD_NAME_SRC_NAME,
+        DB_TABLE_FIELD_NAME_RES,
+        DB_TABLE_FIELD_NAME_FPS
     )
 
     @staticmethod
@@ -38,7 +42,17 @@ operations on in the processing chain. Be aware that each file listed here must 
                     SrcTable.DB_TABLE_FIELD_NAME_SRC_NAME,
                     str,
                     'unique name to identify the source file in the folder "srcVid"'
-                )
+                ),
+                MetaTableField(
+                    SrcTable.DB_TABLE_FIELD_NAME_RES,
+                    str,
+                    'video frame resolution in px'
+                ),
+                MetaTableField(
+                    SrcTable.DB_TABLE_FIELD_NAME_FPS,
+                    int,
+                    'number of frames to encode the video with (unit: frame/s)'
+                ),
             ]
         )
 
@@ -69,5 +83,11 @@ operations on in the processing chain. Be aware that each file listed here must 
         #
 
         self._assert_fields(row, self.DB_TABLE_FIELD_NAME_SRC_ID, [
-            self.DB_TABLE_FIELD_NAME_SRC_NAME
+            self.DB_TABLE_FIELD_NAME_SRC_NAME,
+            self.DB_TABLE_FIELD_NAME_FPS,
+            self.DB_TABLE_FIELD_NAME_RES
         ])
+
+        self._map_int(row, (
+            self.DB_TABLE_FIELD_NAME_FPS
+        ))

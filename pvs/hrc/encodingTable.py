@@ -22,8 +22,6 @@ class EncodingTable(DbHandler, MetaConfigInterface):
 
     # general params
     DB_TABLE_FIELD_NAME_BIT_RATE = 'bit_rate'
-    DB_TABLE_FIELD_NAME_FPS = 'fps'  # frames per second
-    DB_TABLE_FIELD_NAME_RES = 'res'  # rescaling
     DB_TABLE_FIELD_NAME_TWO_PASS = 'two-pass'  # boolean settings if two pass encoding is allowed or not
 
     _valid_field_names = (
@@ -32,8 +30,6 @@ class EncodingTable(DbHandler, MetaConfigInterface):
 
         # general encoding settings
         DB_TABLE_FIELD_NAME_BIT_RATE,
-        DB_TABLE_FIELD_NAME_FPS,
-        DB_TABLE_FIELD_NAME_RES,
         DB_TABLE_FIELD_NAME_TWO_PASS,
 
         # codec specific settings
@@ -70,11 +66,6 @@ class EncodingTable(DbHandler, MetaConfigInterface):
                     EncodingTable.DB_TABLE_FIELD_NAME_BIT_RATE,
                     int,
                     'bit rate the video should be encoded with (unit: kbit/s)'
-                ),
-                MetaTableField(
-                    EncodingTable.DB_TABLE_FIELD_NAME_FPS,
-                    int,
-                    'number of frames to encode the video with (unit: frame/s)'
                 ),
                 MetaTableField(
                     EncodingTable.DB_TABLE_FIELD_NAME_TWO_PASS,
@@ -114,8 +105,6 @@ class EncodingTable(DbHandler, MetaConfigInterface):
             self.DB_TABLE_FIELD_NAME_CODEC_ID,
             self.DB_TABLE_FIELD_NAME_CODEC_SETTINGS_ID,
             self.DB_TABLE_FIELD_NAME_BIT_RATE,
-            self.DB_TABLE_FIELD_NAME_FPS,
-            self.DB_TABLE_FIELD_NAME_RES,
             self.DB_TABLE_FIELD_NAME_TWO_PASS
         ))
 
@@ -123,6 +112,5 @@ class EncodingTable(DbHandler, MetaConfigInterface):
             self.DB_TABLE_FIELD_NAME_ENCODING_ID,
             self.DB_TABLE_FIELD_NAME_CODEC_SETTINGS_ID,
             self.DB_TABLE_FIELD_NAME_BIT_RATE,
-            self.DB_TABLE_FIELD_NAME_FPS,
             (self.DB_TABLE_FIELD_NAME_TWO_PASS, 0, 1)
         ))

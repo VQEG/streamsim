@@ -4,6 +4,7 @@ from abstractCoder import AbstractCoder
 from codec.abstractCodec import AbstractCodec
 from cmd.command import Command
 from cmd.commandCollection import CommandCollection
+from pvs.srcTable import SrcTable
 from pvs.hrcTable import HrcTable
 from pvs.hrc.encodingTable import EncodingTable
 
@@ -156,14 +157,14 @@ class FfmpegCoder(AbstractCoder):
         """
         -s <FRAME_SIZE>: defines the frames' size
         """
-        assert EncodingTable.DB_TABLE_FIELD_NAME_RES in encoding_set
-        command.set_as_posix_option('s', encoding_set[EncodingTable.DB_TABLE_FIELD_NAME_RES])
+        assert SrcTable.DB_TABLE_FIELD_NAME_RES in encoding_set
+        command.set_as_posix_option('s', encoding_set[SrcTable.DB_TABLE_FIELD_NAME_RES])
 
         """
         -r <FPS>: sets the frame rate (frames/second)
         """
-        assert EncodingTable.DB_TABLE_FIELD_NAME_FPS in encoding_set
-        fps = encoding_set[EncodingTable.DB_TABLE_FIELD_NAME_FPS]
+        assert SrcTable.DB_TABLE_FIELD_NAME_FPS in encoding_set
+        fps = encoding_set[SrcTable.DB_TABLE_FIELD_NAME_FPS]
         if fps:
             command.set_as_posix_option('r', float(fps))
 
