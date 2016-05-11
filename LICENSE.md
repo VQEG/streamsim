@@ -1,4 +1,5 @@
-StreamSim
+# StreamSim
+
 Copyright (C) 2016 Telekom Innovation Laboratories
 
 This program is free software: you can redistribute it and/or modify
@@ -12,9 +13,11 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.  If not, see http://www.gnu.org/licenses/
 
------
+------------------
+
+```
 
  GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
@@ -635,3 +638,4 @@ reviewing courts shall apply local law that most closely approximates
 an absolute waiver of all civil liability in connection with the
 Program, unless a warranty or assumption of liability accompanies a
 copy of the Program in return for a fee.
+```
