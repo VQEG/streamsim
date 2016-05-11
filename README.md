@@ -7,6 +7,9 @@ delay/jitter. The transmitted videos are decoded back and can be used to compare
 with the original video. It is also possible to insert the loss behaviour
 offline, without streaming the content over a physical network.
 
+StreamSim is licensed under GNU GPLv3 (see `License.md`) and can be freely used
+and modified.
+
 ## How does it work?
 The toolchain is separated into five dedicated steps, which can be executed
 separately: video encoding, streaming, loss insertion, payload extraction and
