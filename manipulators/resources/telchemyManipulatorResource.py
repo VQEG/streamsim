@@ -434,17 +434,17 @@ then by the telchemy tool to manipulate different pcap files with loss behaviour
                 MetaTableField(
                     TelchemyManipulatorMarkov4StateResource.DB_FIELD_NAME_PDC,
                     float,
-                    'Transition probability from burst lossless to burst lossy state [default: 0.25]'
+                    'Transition probability from burst lossless to burst lossy state [default: 25%]'
                 ),
                 MetaTableField(
                     TelchemyManipulatorMarkov4StateResource.DB_FIELD_NAME_PCD,
                     float,
-                    'Transition probability from burst lossy to burst lossless state [default: 0.05]'
+                    'Transition probability from burst lossy to burst lossless state [default: 50%]'
                 ),
                 MetaTableField(
                     TelchemyManipulatorMarkov4StateResource.DB_FIELD_NAME_PCB,
                     float,
-                    'Transition probability from burst to gap state [default: 0.3]'
+                    'Transition probability from burst to gap state [default: 30%]'
                 ),
                 MetaTableField(
                     TelchemyManipulatorMarkov4StateResource.DB_FIELD_NAME_G,
