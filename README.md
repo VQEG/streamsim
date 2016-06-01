@@ -59,3 +59,4 @@ https://gitlab.com/vqeg/streamsim/wikis/usage
 
 * Advanced usage: https://gitlab.com/vqeg/streamsim/wikis/home#advanced-usage
 * Developers guide: https://gitlab.com/vqeg/streamsim/wikis/home#developers-guideline
+* Example results: https://gitlab.com/vqeg/streamsim/wikis/sample-results
