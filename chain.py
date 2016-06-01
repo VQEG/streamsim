@@ -29,6 +29,17 @@ def __execute_chain():
 
 
 if __name__ == '__main__':
+
+    # announce application name + version!
+
+    app_text = ' %s %s ' % (ProcessingChain.APPLICATION_NAME, ProcessingChain.VERSION_NAME)
+
+    print
+    print ' \x1b[41m\033[1m%s\033[0m' % (' ' * len(app_text))
+    print ' \x1b[41m\033[1m%s\033[0m' % app_text
+    print ' \x1b[41m\033[1m%s\033[0m' % (' ' * len(app_text))
+    print
+
     if DEBUG_MODE:
         __execute_chain()
     else:
