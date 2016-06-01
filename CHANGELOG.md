@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 Please use the changelog style provided by [KeepAChangeLog](http://keepachangelog.com/)
 
 ## [Unreleased]
+### Added
+- Changelog
+- Contribution Guide
 
 ## [v0.1] - 2016-06-01
 ### Added
