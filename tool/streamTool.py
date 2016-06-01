@@ -28,55 +28,6 @@ class StreamTool(AbstractTool):
      appropriate coders. To each stream tcpdump will listen and dump each packet into a separate PCAP-file.
     """
 
-    def __convert_via_mp4box_to_new_format(self, input_path, file_output_format_extension):
-        """
-
-        :param input_path:
-        :param file_output_format_extension:
-        :return:
-        """
-
-        assert isinstance(input_path, basestring)
-        assert isinstance(file_output_format_extension, basestring)
-        assert isfile(input_path)
-        assert exists(input_path)
-
-        """
-        MP4BOX: http://gpac.wp.mines-telecom.fr/mp4box/
-        """
-        mp4box_command = Command('MP4Box')
-
-        """
-        -add <INPUT>: specifies the file to convert
-        """
-
-        mp4box_command.set_as_posix_option('add', input_path)
-
-        """
-        <INPUT> the path to convert in
-        """
-        output_file_path = self._switch_file_extension(input_path, file_output_format_extension)
-        mp4box_command.set_as_argument('OUTPUT', output_file_path)
-
-        """
-        set log output
-        """
-        if self._log_folder:
-            from os.path import splitext, basename, extsep
-            mp42ts_log_file_path = self._log_folder \
-                                 + PATH_SEPARATOR \
-                                 + 'mp42ts_' \
-                                 + splitext(basename(input_path))[0] \
-                                 + extsep \
-                                 + 'log'
-
-            mp4box_command.set_as_log_file(mp42ts_log_file_path) \
-                          .set_std_err_redirect_to_file()
-
-        self._cmd(mp4box_command)
-
-        return output_file_path
-
     def __convert_to_mpeg2ts(self, input_path, codec_name):
         """
         Converts an input file to a specific output format with MP4Box to MPEG2-TS
