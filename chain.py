@@ -8,8 +8,8 @@ __author__ = 'Alexander Dethof'
 from chainApp.processingChain import ProcessingChain
 
 # True if the error warnings should be displayed more detailed; False if the error messages should be just shown and
-# the application should exit by displaying it.
-DEBUG_MODE = True
+# the application should exit by displaying it. By default the debug mode is set to false!
+DEBUG_MODE = False
 
 
 def __execute_chain():
