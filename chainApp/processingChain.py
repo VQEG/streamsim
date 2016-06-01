@@ -1,6 +1,5 @@
 __author__ = 'Alexander Dethof'
 
-from pvs.pvsMatrix import PvsMatrix
 from chainConfig import ChainConfig
 from chainToolRunner import ChainToolRunner
 from chainArgParser import ChainArgParser
@@ -10,6 +9,12 @@ class ProcessingChain:
     """
     Main class to execute the whole processing chain!
     """
+
+    # name of the application this processing chain runs
+    APPLICATION_NAME = 'StreamSim'
+
+    # version name of the running application
+    VERSION_NAME = 'v0.1'
 
     def __init__(self):
         """
