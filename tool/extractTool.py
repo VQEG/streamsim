@@ -97,14 +97,15 @@ class ExtractTool(AbstractTool):
         payload_file.close()
 
         from scapy.all import Packet, rdpcap
+        from scapy.all import bind_layers
+        from scapy.layers.inet import UDP
 
         if is_rtp:
-            from scapy.all import bind_layers
             from scapy.layers.rtp import RTP, Raw
-            from scapy.layers.inet import UDP
             bind_layers(UDP, RTP)
         else:
             from scapy.layers.inet import Raw
+            bind_layers(UDP, Raw)
 
         captured_packets = rdpcap(src_path)
         payload_file = open(destination_path, 'ab')
