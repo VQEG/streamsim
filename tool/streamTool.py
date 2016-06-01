@@ -121,6 +121,15 @@ class StreamTool(AbstractTool):
             if self._is_override_mode:
                 if not self._is_dry_run:
                     remove(pcap_path)
+
+                    ts_path = self._path + STREAM_SOURCE_DIR + PATH_SEPARATOR + self._get_output_file_name(
+                        src_id, hrc_set, 'ts'
+                    )
+
+                    # remove also old ts conversion, if one exists!
+                    if exists(ts_path):
+                        remove(ts_path)
+
                 print "# \033[95m\033[1mREMOVE src %d : hrc %d\033[0m"\
                       % (src_id, int(hrc_set[self._hrc_table.DB_TABLE_FIELD_NAME_HRC_ID]))
             else:
