@@ -97,7 +97,7 @@ class ExtractTool(AbstractTool):
         payload_file.close()
 
         from scapy.all import Packet, rdpcap
-        from scapy.all import bind_layers
+        from scapy.all import bind_layers, split_layers
         from scapy.layers.inet import UDP
 
         if is_rtp:
@@ -127,6 +127,14 @@ class ExtractTool(AbstractTool):
             packet_index += 1
 
         payload_file.close()
+
+        # clean up layer binding for next payload extraction
+        if is_rtp:
+            # noinspection PyUnboundLocalVariable
+            split_layers(UDP, RTP)
+        else:
+            from scapy.layers.inet import Raw
+            split_layers(UDP, Raw)
 
     def __extract_source(self, src_id, hrc_set):
         """
