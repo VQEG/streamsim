@@ -72,7 +72,6 @@ class ExtractTool(AbstractTool):
         assert isinstance(hrc_set, dict)
         assert isinstance(src_path, basestring)
         assert isinstance(file_extension, basestring)
-        assert file_extension in (EXTRACT_MPEGTS_EXTENSION, 'hevc') # TODO dynamic
         assert self._hrc_table.DB_TABLE_FIELD_NAME_HRC_ID in hrc_set
         hrc_id = int(hrc_set[self._hrc_table.DB_TABLE_FIELD_NAME_HRC_ID])
 
@@ -157,28 +156,42 @@ class ExtractTool(AbstractTool):
             src_id, hrc_set, LOSS_OUTPUT_FILE_TYPE_EXTENSION
         )
 
-        # extract for MPEGTS (UDP/RTP)
-        if stream_mode in (
-            self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_MPEGTS_UDP,
-            self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_MPEGTS_RTP
+        # Recover the file extensions depending on the protocol packaging:
+        # ----------------------------------------------------------------
+        #
+        # If the tool was not packed into a TS container, it still has the original
+        # raw file extension
+
+        if stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_RAW_RTP:
+            codec = self._get_codec_by_hrc_set(hrc_set)
+            file_extension = codec.get_raw_file_extension()
+
+        # If the tool was packed into a TS container, the extension is .ts
+        elif stream_mode in (
+                self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_MPEGTS_UDP,
+                self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_MPEGTS_RTP
         ):
-            self.__extract_payload(
+            file_extension = EXTRACT_MPEGTS_EXTENSION
+
+        # In all other cases there must be something wrong
+        else:
+            raise '[SRC%d|HRC%d] Invalid stream mode `%s` given!' % (
                 src_id,
-                hrc_set,
-                src_path,
-                EXTRACT_MPEGTS_EXTENSION,
-                stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_MPEGTS_RTP
+                hrc_set[self._hrc_table.DB_TABLE_FIELD_NAME_HRC_ID],
+                stream_mode
             )
 
-        # extract for raw RTP
-        elif stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_RAW_RTP:
-            self.__extract_payload(src_id, hrc_set, src_path, 'hevc', True)  # TODO dynamic!!
-
-        # raise error for all other modes!
-        else:
-            raise KeyError('Invalid stream mode `%s` @ hrc.id=%d given!' % (
-                stream_mode, int(hrc_set[self._hrc_table.DB_TABLE_FIELD_NAME_HRC_ID])
-            ))
+        # Besides from that we are now ready to extract the payload and store it in a given file format
+        self.__extract_payload(
+            src_id,
+            hrc_set,
+            src_path,
+            file_extension,
+            stream_mode in (
+                self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_MPEGTS_RTP,
+                self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_RAW_RTP
+            )
+        )
 
     def __extract_source_with_hrc(self, source):
         """
