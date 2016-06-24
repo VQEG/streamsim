@@ -24,6 +24,12 @@ class HrcTable(DbHandler, MetaConfigInterface):
     DB_STREAM_MODE_FIELD_VALUE_MPEGTS_UDP = 'mpegts-udp'
     DB_STREAM_MODE_FIELD_VALUE_RAW_RTP = 'raw-rtp'
 
+    # short handler for RTP stream modes
+    SH_RTP_STREAM_MODES = (
+        DB_STREAM_MODE_FIELD_VALUE_MPEGTS_RTP,
+        DB_STREAM_MODE_FIELD_VALUE_RAW_RTP
+    )
+
     # valid stream modes
     VALID_STREAM_MODES = (
         DB_STREAM_MODE_FIELD_VALUE_MPEGTS_RTP,

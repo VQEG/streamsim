@@ -53,8 +53,11 @@ class DecodeTool(AbstractTool):
             )
 
         elif stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_RAW_RTP:
+
+            codec = self._get_codec_by_hrc_set(hrc_set)
+
             return self._path + 'outputHevc' + PATH_SEPARATOR + self._get_output_file_name(
-                src_id, hrc_set, 'sdp'  # TODO dynamic
+                src_id, hrc_set, codec.get_raw_file_extension()
             )
 
         else:

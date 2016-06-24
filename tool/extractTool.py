@@ -22,6 +22,36 @@ class ExtractTool(AbstractTool):
     This tool is used to extract the payload of the transmitted .pcap files.
     """
 
+    def __validate_for_video_packet(self, packet, stream_mode):
+
+        if stream_mode in self._hrc_table.SH_RTP_STREAM_MODES:
+            uses_rtp = True
+            from scapy.layers.rtp import RTP, Raw
+        else:
+            uses_rtp = False
+            from scapy.layers.inet import UDP, Raw
+
+        assert packet.haslayer(Raw), 'Packet does not contain any payload!'
+
+        if uses_rtp:
+
+            # noinspection PyUnboundLocalVariable
+            pt = int(packet[RTP].getfieldval('payload'))
+
+            # RTP-RAW
+            if stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_RAW_RTP:
+                assert 96 <= pt <= 127, 'Packet has no valid payload content! Content is: %s' % pt
+
+            # RTP-MPEGTS
+            elif stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_MPEGTS_RTP:
+                assert pt == 33, 'Packet has no valid payload content! Content is: %s' % pt
+
+        else:
+
+            # UDP-MPEGTS
+            if stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_MPEGTS_UDP:
+                pass  # TODO is there a check required?
+
     def __dump_depacketization_state(self, src_id, hrc_id, packet_index, packet_count):
         """
         Dumps the depacketization state of a pcap file.
@@ -48,7 +78,7 @@ class ExtractTool(AbstractTool):
 
         print '[SRC: %d|HRC: %d] Process packet: %d/%d' % (src_id, hrc_id, packet_index, packet_count)
 
-    def __extract_payload(self, src_id, hrc_set, src_path, file_extension, is_rtp):
+    def __extract_payload(self, src_id, hrc_set, src_path, file_extension, stream_mode):
         """
         Writes the complete payload of a pcap file into a separate file.
 
@@ -64,16 +94,22 @@ class ExtractTool(AbstractTool):
         :param file_extension: The extension which is added to the file
         :type file_extension: basestring
 
-        :param is_rtp: true if the pcap file contains an rtp stream, false otherwise.
-        :type is_rtp: bool
+        :param stream_mode: the mode how the data was streamed
+        :type stream_mode: basestring
         """
 
         assert isinstance(src_id, int)
         assert isinstance(hrc_set, dict)
         assert isinstance(src_path, basestring)
         assert isinstance(file_extension, basestring)
+        assert isinstance(stream_mode, basestring)
+        assert stream_mode in self._hrc_table.VALID_STREAM_MODES
+
         assert self._hrc_table.DB_TABLE_FIELD_NAME_HRC_ID in hrc_set
         hrc_id = int(hrc_set[self._hrc_table.DB_TABLE_FIELD_NAME_HRC_ID])
+
+        # create short handler if rtp streaming was used
+        is_rtp = stream_mode in self._hrc_table.SH_RTP_STREAM_MODES
 
         # set destination folder
         destination_path = self._path \
@@ -116,12 +152,10 @@ class ExtractTool(AbstractTool):
 
             self.__dump_depacketization_state(src_id, hrc_id, packet_index, packet_count)
 
-            if packet.haslayer(Raw):
+            try:
+                self.__validate_for_video_packet(packet, stream_mode)
                 payload_file.write(packet[Raw].load)
-            else:
-                self._log_warning(Warning(
-                    "[SRC:%d|HRC:%d] Packet %d/%d contains no payload!" % (src_id, hrc_id, packet_index, packet_count)
-                ))
+            except: pass
 
             packet_index += 1
 
@@ -187,10 +221,7 @@ class ExtractTool(AbstractTool):
             hrc_set,
             src_path,
             file_extension,
-            stream_mode in (
-                self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_MPEGTS_RTP,
-                self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_RAW_RTP
-            )
+            stream_mode
         )
 
     def __extract_source_with_hrc(self, source):
