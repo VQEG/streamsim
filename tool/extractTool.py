@@ -48,7 +48,9 @@ class ExtractTool(AbstractTool):
             from bitstreamparse.rtp.mp2t import Mp2t as RtpMp2t
             return RtpMp2t(src_path)
 
-        # TODO RAW-RTP
+        elif stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_RAW_RTP:
+            from bitstreamparse.rtp.rawVideo import RawVideo as RtpRawVideo
+            return RtpRawVideo(src_path)
 
         else:
             raise Exception('Not implemented yet!')
