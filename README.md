@@ -18,7 +18,7 @@ cite the following publication:
 > Alexander M. Dethof, Werner Robitza, Marie-Neige Garcia, "StreamSim: A Video
 Streaming Simulation Toolchain for Unreliable Transport Mechanisms", in:
 QoMEX – Eighth International Conference on Quality of Multimedia Experience,
-Lisbon, June 2016.
+Lisbon, June 2016. DOI: [10.13140/RG.2.1.4394.4562](http://dx.doi.org/10.13140/RG.2.1.4394.4562)
 
 ## How does it work?
 The toolchain is separated into five dedicated steps, which can be executed
