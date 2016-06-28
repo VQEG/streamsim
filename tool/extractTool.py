@@ -37,6 +37,7 @@ class ExtractTool(AbstractTool):
 
             # noinspection PyUnboundLocalVariable
             pt = int(packet[RTP].getfieldval('payload'))
+            ssrc_id = int(packet[RTP].getfieldval('sourcesync'))
 
             # RTP-RAW
             if stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_RAW_RTP:
@@ -45,6 +46,16 @@ class ExtractTool(AbstractTool):
             # RTP-MPEGTS
             elif stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_MPEGTS_RTP:
                 assert pt == 33, 'Packet has no valid payload content! Content is: %s' % pt
+
+            if self.__pt is None:
+                self.__pt = pt
+            else:
+                assert self.__pt == pt, 'The packet payload type is not the same then the usually used one!'
+
+            if self.__ssrc is None:
+                self.__ssrc = ssrc_id
+            else:
+                assert self.__ssrc == ssrc_id, 'SSRC ID is different!'
 
         else:
 
@@ -138,6 +149,13 @@ class ExtractTool(AbstractTool):
         if is_rtp:
             from scapy.layers.rtp import RTP, Raw
             bind_layers(UDP, RTP)
+
+            # reset payload type
+            self.__pt = None
+
+            # reset SSRC-ID
+            self.__ssrc = None
+
         else:
             from scapy.layers.inet import Raw
             bind_layers(UDP, Raw)
