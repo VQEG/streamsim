@@ -10,6 +10,16 @@ offline, without streaming the content over a physical network.
 StreamSim is licensed under GNU GPLv3 (see `License.md`) and can be freely used
 and modified.
 
+## Usage
+
+If you have used StreamSim and publish results based on it, we kindly ask you to 
+cite the following publication:
+
+> Alexander M. Dethof, Werner Robitza, Marie-Neige Garcia, "StreamSim: A Video
+Streaming Simulation Toolchain for Unreliable Transport Mechanisms", in:
+QoMEX – Eighth International Conference on Quality of Multimedia Experience,
+Lisbon, June 2016.
+
 ## How does it work?
 The toolchain is separated into five dedicated steps, which can be executed
 separately: video encoding, streaming, loss insertion, payload extraction and
@@ -59,3 +69,4 @@ https://gitlab.com/vqeg/streamsim/wikis/usage
 
 * Advanced usage: https://gitlab.com/vqeg/streamsim/wikis/home#advanced-usage
 * Developers guide: https://gitlab.com/vqeg/streamsim/wikis/home#developers-guideline
+* Example results: https://gitlab.com/vqeg/streamsim/wikis/sample-results
