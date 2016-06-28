@@ -113,7 +113,7 @@ class Operator(object):
         system(command)
 
     @staticmethod
-    def _remove_last_output():
+    def remove_last_output():
         """
         Removes the last output done in stdout
         """

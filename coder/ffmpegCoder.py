@@ -474,11 +474,10 @@ class FfmpegCoder(AbstractCoder):
         """
         -c:v sets the video codec
         """
-        if stream_mode == HrcTable.DB_STREAM_MODE_FIELD_VALUE_MPEGTS_UDP:
-            command.set_as_posix_option('c:v', 'copy')
+        if stream_mode == HrcTable.DB_STREAM_MODE_FIELD_VALUE_MPEGTS_RTP:
+            command.set_as_posix_option('c:v', codec.get_library_name()) # for MPEGTS_RTP required!
         else:
-            command.set_as_posix_option('c:v', codec.get_library_name()) # FIXME just for debug!!
-
+            command.set_as_posix_option('c:v', 'copy')
 
         """
         -an (<OUTPUT>): disable audio output

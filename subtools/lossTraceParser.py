@@ -44,7 +44,7 @@ class LossTraceParser(AbstractSubTool):
         assert isinstance(packet_count, int)
 
         if packet_index > 1:
-            self._remove_last_output()
+            self.remove_last_output()
 
         print '[%s] Process packet: %d/%d' % (basename(self.__trace_file_path), packet_index, packet_count)
 

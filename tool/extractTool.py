@@ -22,170 +22,36 @@ class ExtractTool(AbstractTool):
     This tool is used to extract the payload of the transmitted .pcap files.
     """
 
-    def __validate_for_video_packet(self, packet, stream_mode):
-
-        if stream_mode in self._hrc_table.SH_RTP_STREAM_MODES:
-            uses_rtp = True
-            from scapy.layers.rtp import RTP, Raw
-        else:
-            uses_rtp = False
-            from scapy.layers.inet import UDP, Raw
-
-        assert packet.haslayer(Raw), 'Packet does not contain any payload!'
-
-        if uses_rtp:
-
-            # noinspection PyUnboundLocalVariable
-            pt = int(packet[RTP].getfieldval('payload'))
-            ssrc_id = int(packet[RTP].getfieldval('sourcesync'))
-
-            # RTP-RAW
-            if stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_RAW_RTP:
-                assert 96 <= pt <= 127, 'Packet has no valid payload content! Content is: %s' % pt
-
-            # RTP-MPEGTS
-            elif stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_MPEGTS_RTP:
-                assert pt == 33, 'Packet has no valid payload content! Content is: %s' % pt
-
-            if self.__pt is None:
-                self.__pt = pt
-            else:
-                assert self.__pt == pt, 'The packet payload type is not the same then the usually used one!'
-
-            if self.__ssrc is None:
-                self.__ssrc = ssrc_id
-            else:
-                assert self.__ssrc == ssrc_id, 'SSRC ID is different!'
-
-        else:
-
-            # UDP-MPEGTS
-            if stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_MPEGTS_UDP:
-                pass  # TODO is there a check required?
-
-    def __dump_depacketization_state(self, src_id, hrc_id, packet_index, packet_count):
+    def _get_parser(self, src_path, stream_mode):
         """
-        Dumps the depacketization state of a pcap file.
+        Returns an adequate bitstream parser concerning the currently used streaming settings.
 
-        :param src_id: the id of the source which is depacketized
-        :type src_id: int
-
-        :param hrc_id: the id of the applied HRC set
-        :type hrc_id: int
-
-        :param packet_index: the index of the packet which is opened
-        :type packet_index: int
-
-        :param packet_count: the number of total packets to depacketize
-        :type packet_count: int
-        """
-
-        assert isinstance(src_id, int)
-        assert isinstance(hrc_id, int)
-        assert isinstance(packet_index, int)
-
-        if packet_index > 1:
-            self._remove_last_output()
-
-        print '[SRC: %d|HRC: %d] Process packet: %d/%d' % (src_id, hrc_id, packet_index, packet_count)
-
-    def __extract_payload(self, src_id, hrc_set, src_path, file_extension, stream_mode):
-        """
-        Writes the complete payload of a pcap file into a separate file.
-
-        :param src_id: the id of the source the pcap file is linked to
-        :type src_id: int
-
-        :param hrc_set: the hrc set the pcap file is linked to
-        :type hrc_set: dict
-
-        :param src_path: the path of the pcap file to read
+        :param src_path: the path of the packet capture file to parse
         :type src_path: basestring
 
-        :param file_extension: The extension which is added to the file
-        :type file_extension: basestring
-
-        :param stream_mode: the mode how the data was streamed
+        :param stream_mode: the mode the data was streamed
         :type stream_mode: basestring
+
+        :return: an adequate bitstream parser concerning the currently used streaming settings
+        :rtype: bitstreamparse.bitStreamParser.BitStreamParser
         """
 
-        assert isinstance(src_id, int)
-        assert isinstance(hrc_set, dict)
         assert isinstance(src_path, basestring)
-        assert isinstance(file_extension, basestring)
         assert isinstance(stream_mode, basestring)
         assert stream_mode in self._hrc_table.VALID_STREAM_MODES
 
-        assert self._hrc_table.DB_TABLE_FIELD_NAME_HRC_ID in hrc_set
-        hrc_id = int(hrc_set[self._hrc_table.DB_TABLE_FIELD_NAME_HRC_ID])
+        if stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_MPEGTS_UDP:
+            from bitstreamparse.udp.mp2t import Mp2t as UdpMp2t
+            return UdpMp2t(src_path)
 
-        # create short handler if rtp streaming was used
-        is_rtp = stream_mode in self._hrc_table.SH_RTP_STREAM_MODES
+        elif stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_MPEGTS_RTP:
+            from bitstreamparse.rtp.mp2t import Mp2t as RtpMp2t
+            return RtpMp2t(src_path)
 
-        # set destination folder
-        destination_path = self._path \
-                           + EXTRACT_DESTINATION_DIR \
-                           + PATH_SEPARATOR \
-                           + self._get_output_file_name(src_id, hrc_set, file_extension)
-
-        if exists(destination_path) and not self._is_override_mode:
-            print "# \033[95m\033[1mSKIP src %d : hrc %d\033[0m" % (src_id, hrc_id)
-            return
-
-        print "# \033[1m\033[94mRUN : SCAPY --> Extract payload from %s to %s\033[0m" % (src_path, destination_path)
-
-        if self._is_dry_run:
-            return
-
-        # clear payload file
-        payload_file = open(destination_path, 'w')
-        payload_file.flush()
-        payload_file.close()
-
-        from scapy.all import Packet, rdpcap
-        from scapy.all import bind_layers, split_layers
-        from scapy.layers.inet import UDP
-
-        if is_rtp:
-            from scapy.layers.rtp import RTP, Raw
-            bind_layers(UDP, RTP)
-
-            # reset payload type
-            self.__pt = None
-
-            # reset SSRC-ID
-            self.__ssrc = None
+        # TODO RAW-RTP
 
         else:
-            from scapy.layers.inet import Raw
-            bind_layers(UDP, Raw)
-
-        captured_packets = rdpcap(src_path)
-        payload_file = open(destination_path, 'ab')
-
-        packet_count = len(captured_packets)
-        packet_index = 1
-        for packet in captured_packets:
-            assert isinstance(packet, Packet)
-
-            self.__dump_depacketization_state(src_id, hrc_id, packet_index, packet_count)
-
-            try:
-                self.__validate_for_video_packet(packet, stream_mode)
-                payload_file.write(packet[Raw].load)
-            except: pass
-
-            packet_index += 1
-
-        payload_file.close()
-
-        # clean up layer binding for next payload extraction
-        if is_rtp:
-            # noinspection PyUnboundLocalVariable
-            split_layers(UDP, RTP)
-        else:
-            from scapy.layers.inet import Raw
-            split_layers(UDP, Raw)
+            raise Exception('Not implemented yet!')
 
     def __extract_source(self, src_id, hrc_set):
         """
@@ -233,14 +99,35 @@ class ExtractTool(AbstractTool):
                 stream_mode
             )
 
-        # Besides from that we are now ready to extract the payload and store it in a given file format
-        self.__extract_payload(
-            src_id,
-            hrc_set,
-            src_path,
-            file_extension,
-            stream_mode
+        # set destination path
+        destination_path = self._path \
+                           + EXTRACT_DESTINATION_DIR \
+                           + PATH_SEPARATOR \
+                           + self._get_output_file_name(src_id, hrc_set, file_extension)
+
+        hrc_id = hrc_set[self._hrc_table.DB_TABLE_FIELD_NAME_HRC_ID]
+
+        if exists(destination_path) and not self._is_override_mode:
+            print "# \033[95m\033[1mSKIP src %d : hrc %d\033[0m" % (src_id, hrc_id)
+            return
+
+        print "# \033[1m\033[94mRUN : [SRC:%d|HRC%d] scapy --> Extract payload from %s to %s\033[0m" % (
+            src_id, hrc_id, src_path, destination_path
         )
+
+        if self._is_dry_run:
+            return
+
+        parser = self._get_parser(src_path, stream_mode)
+
+        # write bitstream into file
+        payload_file = open(destination_path, 'w')
+        payload_file.flush()
+
+        bit_stream = parser.get_bit_stream()
+        payload_file.write(bit_stream)
+
+        payload_file.close()
 
     def __extract_source_with_hrc(self, source):
         """
