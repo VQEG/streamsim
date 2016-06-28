@@ -85,6 +85,12 @@ class AbstractTool(Operator):
         self._exceptions = list()
         self._registered_sub_tools = list()
 
+        # set tool specific options
+        tool_options = self._config.get_tool_options()
+        tool_id = self._config.get_tool_id()
+
+        self.set_tool_options(tool_options[tool_id])
+
     def execute(self):
         """
         Function which should be overwritten in each tool, to execute the tool's functionality.

@@ -169,11 +169,16 @@ class ChainToolRunner:
         tool_options = config.get_tool_options()
 
         if tool_id in tool_options:
-            tool_options = tool_options[tool_id]
+            tool_options = {tool_id: tool_options[tool_id]}
         else:
             tool_options = dict()
 
+        # override config tool options only with the relevant ones, the others are not interesting!
         config.set_tool_options(tool_options)
+
+        # set the id of the current tool to execute
+        config.set_tool_id(tool_id)
+
         return config
 
     def __init_encode_tool(self, config):
