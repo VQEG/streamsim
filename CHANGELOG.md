@@ -8,7 +8,8 @@ Please use the changelog style provided by [KeepAChangeLog](http://keepachangelo
 - Contribution Guide
 
 ### Changed
-- Fixed raw RTP streaming issues
+- Added RTP streaming validation checks
+- Fixed issues which occured during the usage of sub tools
 
 ## [v0.1] - 2016-06-01
 ### Added
