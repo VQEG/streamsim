@@ -7,6 +7,9 @@ Please use the changelog style provided by [KeepAChangeLog](http://keepachangelo
 - Changelog
 - Contribution Guide
 
+### Changed
+- Fixed raw RTP streaming issues
+
 ## [v0.1] - 2016-06-01
 ### Added
 - Initial Release of v0.1
