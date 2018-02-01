@@ -132,7 +132,8 @@ class DbTable:
         assert self.__id_field_name in valid_field_names
 
         # Assert that the given path is a valid file
-        assert os.path.isfile(self.__path)
+        assert os.path.isfile(self.__path),\
+            'The path `%s` is not a valid database table file!' % self.__path
 
         # Assert that the file at the given path is readable
         assert os.access(self.__path, os.R_OK)

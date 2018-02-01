@@ -113,6 +113,11 @@ for video encoding techniques in the context of the processing chain.""",
         )
 
     @staticmethod
+    def get_bit_stream_parser(src_path):
+        from bitstreamparse.rtp.hevc import Hevc as RtpHevc
+        return RtpHevc(src_path)
+
+    @staticmethod
     def get_library_name():
         """
         Returns the name of the codec's library where the codec is implemented in.

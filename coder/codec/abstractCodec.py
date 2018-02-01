@@ -43,6 +43,11 @@ class AbstractCodec(MetaConfigInterface):
 
     @staticmethod
     @abstractmethod
+    def get_bit_stream_parser(src_path):
+        pass
+
+    @staticmethod
+    @abstractmethod
     def _get_codec_table_path():
         """
         Returns the path of the codec's configuration table.

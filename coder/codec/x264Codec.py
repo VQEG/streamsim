@@ -84,6 +84,10 @@ for video encoding techniques in the context of the processing chain.""",
         )
 
     @staticmethod
+    def get_bit_stream_parser(src_path):
+        raise Exception('Not implemented yet!')
+
+    @staticmethod
     def get_library_name():
         """
         Returns the name of the codec's library where the codec is implemented in.

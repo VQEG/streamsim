@@ -22,9 +22,9 @@ class ExtractTool(AbstractTool):
     This tool is used to extract the payload of the transmitted .pcap files.
     """
 
-    def _get_parser(self, src_path, stream_mode):
+    def _get_parser(self, src_path, stream_mode, codec):
         """
-        Returns an adequate bitstream parser concerning the currently used streaming settings.
+        Returns an adequate bit stream parser concerning the currently used streaming settings.
 
         :param src_path: the path of the packet capture file to parse
         :type src_path: basestring
@@ -32,7 +32,10 @@ class ExtractTool(AbstractTool):
         :param stream_mode: the mode the data was streamed
         :type stream_mode: basestring
 
-        :return: an adequate bitstream parser concerning the currently used streaming settings
+        :param codec: the codec used for the data streaming
+        :type codec: coder.codec.abstractCodec.AbstractCodec
+
+        :return: an adequate bit stream parser concerning the currently used streaming settings
         :rtype: bitstreamparse.bitStreamParser.BitStreamParser
         """
 
@@ -49,8 +52,7 @@ class ExtractTool(AbstractTool):
             return RtpMp2t(src_path)
 
         elif stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_RAW_RTP:
-            from bitstreamparse.rtp.rawVideo import RawVideo as RtpRawVideo
-            return RtpRawVideo(src_path)
+            return codec.get_bit_stream_parser(src_path)
 
         else:
             raise Exception('Not implemented yet!')
@@ -82,8 +84,8 @@ class ExtractTool(AbstractTool):
         # If the tool was not packed into a TS container, it still has the original
         # raw file extension
 
+        codec = self._get_codec_by_hrc_set(hrc_set)
         if stream_mode == self._hrc_table.DB_STREAM_MODE_FIELD_VALUE_RAW_RTP:
-            codec = self._get_codec_by_hrc_set(hrc_set)
             file_extension = codec.get_raw_file_extension()
 
         # If the tool was packed into a TS container, the extension is .ts
@@ -120,7 +122,7 @@ class ExtractTool(AbstractTool):
         if self._is_dry_run:
             return
 
-        parser = self._get_parser(src_path, stream_mode)
+        parser = self._get_parser(src_path, stream_mode, codec)
 
         # write bitstream into file
         payload_file = open(destination_path, 'w')
