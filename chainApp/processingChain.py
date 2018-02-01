@@ -14,7 +14,7 @@ class ProcessingChain:
     APPLICATION_NAME = 'StreamSim'
 
     # version name of the running application
-    VERSION_NAME = 'v0.1'
+    VERSION_NAME = 'v0.1.1a'
 
     def __init__(self):
         """
